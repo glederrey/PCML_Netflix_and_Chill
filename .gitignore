@@ -90,3 +90,7 @@ ENV/
 
 # Remove csv in notebooks
 notebooks/*.csv
+
+# Remove PySpark database
+notebooks/metastore_db/*
+
