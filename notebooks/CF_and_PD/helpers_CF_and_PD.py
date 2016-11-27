@@ -242,6 +242,11 @@ def get_preprocessing(non_dom_users_file):
 
     with open(non_dom_users_file, "r") as file:
         C = file.readlines()
+        
+    for i in range(len(C)):
+        C[i] = C[i][1:-2]
+        tmp = C[i].split(', ')
+        C[i] = list(map(int, tmp))    
 
     return C
 
