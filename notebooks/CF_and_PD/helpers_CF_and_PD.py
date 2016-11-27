@@ -230,25 +230,13 @@ def preprocessing(folder, U, I_u, R, nbr_jobs=None, subset=None):
         filename = folder + "C_" + str(usr) + ".pickle"
         C.append(pickle.load(open(filename, "rb")))
 
-    with open(folder + "non-dominated-users.dat", "w") as file:
-        for item in C:
-            file.write("{}\n".format(item))
+    pickle.dump(C, open(folder + "non-dominated-users.pickle", "wb"))
 
-    return folder + "non-dominated-users.dat"
+    return folder + "non-dominated-users.pickle"
 
-def get_preprocessing(non_dom_users_file):
+def get_pickle(non_dom_users_file):   
 
-    print("Loading the preprocessing file")
-
-    with open(non_dom_users_file, "r") as file:
-        C = file.readlines()
-        
-    for i in range(len(C)):
-        C[i] = C[i][1:-2]
-        tmp = C[i].split(', ')
-        C[i] = list(map(int, tmp))    
-
-    return C
+    return pickle.load(open(non_dom_users_file, "rb"))
 
 
 
