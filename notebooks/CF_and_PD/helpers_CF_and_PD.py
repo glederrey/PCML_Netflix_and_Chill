@@ -15,11 +15,10 @@ import pandas as pd
 import numpy as np
 import multiprocessing
 import pickle
-
-import matplotlib.pyplot as plt
-import itertools
+import scipy.stats as sp
+import scipy.spatial.distance as spsd
+from operator import itemgetter
 from joblib import Parallel, delayed
-
 
 
 def prepare_data(dataset):
@@ -40,6 +39,7 @@ def prepare_data(dataset):
     data['MovieID'] = data['Id'].apply(lambda x: int(x.split('_')[1][1:]) - 1)
 
     return data
+
 
 def variables(data):
     """
@@ -197,7 +197,8 @@ def create_Cu(U, u, I_u, R, folder):
     pickle.dump(C_u, open(filename, "wb"))
     print("  C_%i created"%(u))
 
-def preprocessing(folder, U, I_u, R, nbr_jobs=None, subset=None):
+
+def non_dominated_users(folder, U, I_u, R, nbr_jobs=None, subset=None):
     """
         Creates all the files with the sets of dominated users. At the end, it will compile everything into
         a single txt file called "non-dominated-users.dat".
@@ -234,9 +235,175 @@ def preprocessing(folder, U, I_u, R, nbr_jobs=None, subset=None):
 
     return folder + "non-dominated-users.pickle"
 
-def get_pickle(non_dom_users_file):   
+
+def get_pickle(non_dom_users_file):
+    """
+        Return an object loaded from a pickle file
+
+    :param      non_dom_users_file: Name of the file to load (need to be a pickle file)
+
+    :return:    Object loaded
+    """
 
     return pickle.load(open(non_dom_users_file, "rb"))
+
+
+def pearson_vector(R, u, I_u, set_user):
+    """
+       Create the vector of pearson's correlation for an active user against all the users in the set.
+
+    :param      R: Matrix of Ratings
+    :param      u: An active user
+    :param      I_u: List of arrays of items rated by each user
+    :param      set: Give a set of users. Can be U (all the users), C_u (non-dominated users w.r.t active user u) or something else
+
+    :return:    The vector of pearson's correlation
+    """
+    # items rated by u
+    items_u = I_u[u]
+
+    corr_vec = []
+
+    # Compute the Pearson's correlation for all users in the set
+    for x in set_user:
+        # Set of items rated by both users
+        A_ux = list(set(items_u).intersection(set(I_u[x])))
+        corr = np.abs(sp.pearsonr(R[u, A_ux], R[x, A_ux])[0])
+        if corr != corr:
+            corr_vec.append(0.0)
+        else:
+            corr_vec.append(corr)
+
+    return corr_vec
+
+
+def cosine_vector(R, u, I_u, set_user):
+    """
+       Create the vector of cosine values for an active user against all the users in the set.
+
+    :param      R: Matrix of Ratings
+    :param      u: An active user
+    :param      I_u: List of arrays of items rated by each user
+    :param      set_user: Give a set of users. Can be U (all the users), C_u (non-dominated users w.r.t active user u) or something else
+
+    :return:    The vector of cosine values
+    """
+
+    # items rated by u
+    items_u = I_u[u]
+
+    cosine_vec = []
+
+    # Computer Cosine for all users in the set
+    for x in set_user:
+        # Set of items rated by both users
+        A_ux = list(set(items_u).intersection(set(I_u[x])))
+        if len(R[u, A_ux]) == 0:
+            cosine_vec.append(-np.inf)
+        else:
+            cosine_vec.append(spsd.cosine(R[u, A_ux], R[x, A_ux]))
+
+    return cosine_vec
+
+
+def msd_vector(R, u, I_u, set_user):
+    """
+       Create the vector of MSD (Mean Squared Difference) values for an active user against all the users in the set.
+
+    :param      R: Matrix of Ratings
+    :param      u: An active user
+    :param      I_u: List of arrays of items rated by each user
+    :param      set: Give a set of users. Can be U (all the users), C_u (non-dominated users w.r.t active user u) or something else
+
+    :return:    The vector of MSD values
+    """
+
+    # items rated by u
+    items_u = I_u[u]
+
+    msd_vec = []
+
+    # Computer MSD for all users in the set
+    for x in set_user:
+        # Set of items rated by both users
+        A_ux = list(set(items_u).intersection(set(I_u[x])))
+        msd_vec.append(msd(R[u, A_ux], R[x, A_ux]))
+
+    return msd_vec
+
+
+def msd(x, y):
+    """
+        MSD value for two vectors X and Y
+    :param      x: vector of float values
+    :param      y: vector of float values
+    :return:    MSD value between the two vectors
+    """
+    # WARNING: We hardcode the max and min value here
+    max_ = 5
+    min_ = 1
+
+    if len(x) == 0:
+        return -np.inf
+    else:
+        return 1 - (1 / len(x)) * np.sum(((x - y) / (max_ - min_)) ** 2)
+
+
+def nearest_neighbors(folder, R, U, I_u, method, subset=None):
+    """
+        Create and write the vector of nereast neighbors. The first item is the nearest and the last item
+        is the furthest.
+
+    :param      folder: Folder where to save the pickle files
+    :param      R: Matrix of Ratings
+    :param      U: Array of users
+    :param      I_u: List of arrays of items rated by each user
+    :param      method: Name of the method to get the nearest neighbors
+    :param      subset: If None, it will be all the users. If you want to set it, use the C list of array
+
+    :return:    Return the name of the pickle file where all the nearest neighbors have been registered
+    """
+    print("Start Calculating Nearest Neighbors for method %s"%method)
+
+    # Loop on all users
+    for u in U:
+        usrs = []
+        if subset == None:
+            usrs = U
+        else:
+            usrs = subset[u]
+
+        # Get the similarity vectors
+        if method == 'pearson':
+            vec = pearson_vector(R, u, I_u, usrs)
+        elif method == 'cosine':
+            vec = cosine_vector(R, u, I_u, usrs)
+        elif method == 'msd':
+            vec = msd_vector(R, u, I_u, usrs)
+
+        # Sort the vector
+        sorted_vec = sorted(enumerate(vec), key=itemgetter(1), reverse=True)
+
+        NN_u = [usrs[i[0]] for i in sorted_vec]
+
+        # Save the file
+        filename = folder + "NN_" + str(u) + "_" + method + ".pickle"
+        pickle.dump(NN_u, open(filename, "wb"))
+
+        if (u + 1) % 500 == 0:
+            print("  %i/%i done!" % (u + 1, len(U)))
+
+    # Get all the individual files and save the big one!
+    NN = []
+    for usr in U:
+        filename = folder + "NN_" + str(usr) + "_" + method + ".pickle"
+        NN.append(pickle.load(open(filename, "rb")))
+
+    file_name = folder + "NN_" + method + ".pickle"
+
+    pickle.dump(NN, open(file_name, "wb"))
+
+    return file_name
 
 
 

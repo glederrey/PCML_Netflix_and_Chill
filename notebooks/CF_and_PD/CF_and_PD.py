@@ -16,25 +16,32 @@ def main():
     # Prepare the data
     U, I, R, I_u = variables(data)
 
-    """ Use these line if you start from scratch
-
-    # Folder for the pickles files
+    # Folder for the pickle file
     folder = "./pickles/"
 
+    """ Use these line if you start from scratch
     # Do the preprocessing
-    non_dom_users_file = preprocessing(folder, U, I_u, R)
+    non_dom_users_file = non_dominated_users(folder, U, I_u, R)
 
     """
-
-    # Folder for the preprocessing file
-    folder = "./"
 
     non_dom_users_file = folder + "non-dominated-users.dat"
 
     # Get the file
-    C = get_preprocessing(non_dom_users_file)
+    C = get_pickle(non_dom_users_file)
 
-    print(C[0])
+    """ Use these line if you start from scratch
+    # Get the Nearest neighbors for the 3 different methods
+    NN_pearson_file = nearest_neighbors(folder, R, U, I_u, "pearson", subset=C)
+    NN_cosine_file = nearest_neighbors(folder, R, U, I_u, "cosine", subset=C)
+    NN_msd_file = nearest_neighbors(folder, R, U, I_u, "msd", subset=C)
+    """
+
+    NN_pearson_file = folder + "NN_pearson.pickle"
+    NN_cosine_file = folder + "NN_copsine.pickle"
+    NN_msd_file = folder + "NN_msd.pickle"
+
+
 
 if __name__ == "__main__":
     main()
