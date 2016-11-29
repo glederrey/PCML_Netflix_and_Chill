@@ -301,7 +301,7 @@ def cosine_vector(R, u, I_u, set_user):
         if len(R[u, A_ux]) == 0:
             cosine_vec.append(-np.inf)
         else:
-            cosine_vec.append(spsd.cosine(R[u, A_ux], R[x, A_ux]))
+            cosine_vec.append(1-spsd.cosine(R[u, A_ux], R[x, A_ux]))
 
     return cosine_vec
 
@@ -385,10 +385,15 @@ def nearest_neighbors(folder, R, U, I_u, method, subset=None):
         sorted_vec = sorted(enumerate(vec), key=itemgetter(1), reverse=True)
 
         NN_u = [usrs[i[0]] for i in sorted_vec]
+        sim_u = [i[1] for i in sorted_vec]
 
-        # Save the file
-        filename = folder + "NN_" + str(u) + "_" + method + ".pickle"
-        pickle.dump(NN_u, open(filename, "wb"))
+        # Save the files
+        filename_NN = folder + "NN_" + str(u) + "_" + method + ".pickle"
+        pickle.dump(NN_u, open(filename_NN, "wb"))
+
+        filename_sim = folder + "sim_" + str(u) + "_" + method + ".pickle"
+        pickle.dump(sim_u, open(filename_sim, "wb"))
+
 
         if (u + 1) % 500 == 0:
             print("  %i/%i done!" % (u + 1, len(U)))
@@ -399,9 +404,18 @@ def nearest_neighbors(folder, R, U, I_u, method, subset=None):
         filename = folder + "NN_" + str(usr) + "_" + method + ".pickle"
         NN.append(pickle.load(open(filename, "rb")))
 
-    file_name = folder + "NN_" + method + ".pickle"
+    file_name_NN = folder + "NN_" + method + ".pickle"
 
-    pickle.dump(NN, open(file_name, "wb"))
+    pickle.dump(NN, open(file_name_NN, "wb"))
+
+    sim = []
+    for usr in U:
+        filename = folder + "sim_" + str(usr) + "_" + method + ".pickle"
+        sim.append(pickle.load(open(filename, "rb")))
+
+    file_name_sim = folder + "sim_" + method + ".pickle"
+
+    pickle.dump(NsimN, open(file_name_sim, "wb"))
 
     return file_name
 

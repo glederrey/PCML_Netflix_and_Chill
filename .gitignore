@@ -99,3 +99,8 @@ notebooks/*.csv
 # Remove PySpark database
 notebooks/metastore_db/*
 
+# Remove pickle files
+*.pickle
+*/*.pickle
+*/*/*.pickle
+

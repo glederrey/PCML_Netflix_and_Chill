@@ -31,17 +31,17 @@ def main():
     C = get_pickle(non_dom_users_file)
 
     """ Use these line if you start from scratch
+
     # Get the Nearest neighbors for the 3 different methods
     NN_pearson_file = nearest_neighbors(folder, R, U, I_u, "pearson", subset=C)
     NN_cosine_file = nearest_neighbors(folder, R, U, I_u, "cosine", subset=C)
     NN_msd_file = nearest_neighbors(folder, R, U, I_u, "msd", subset=C)
+
     """
 
     NN_pearson_file = folder + "NN_pearson.pickle"
-    NN_cosine_file = folder + "NN_copsine.pickle"
+    NN_cosine_file = folder + "NN_cosine.pickle"
     NN_msd_file = folder + "NN_msd.pickle"
-
-
 
 if __name__ == "__main__":
     main()
