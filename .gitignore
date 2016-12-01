@@ -1,6 +1,7 @@
 # intelliJ
 .idea/*
-
+*/.idea
+*/*/.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -97,4 +98,9 @@ notebooks/*.csv
 
 # Remove PySpark database
 notebooks/metastore_db/*
+
+# Remove pickle files
+*.pickle
+*/*.pickle
+*/*/*.pickle
 
