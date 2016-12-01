@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from pyspark.mllib.recommendation import ALS
+import pyspark
 import itertools
 
 
@@ -19,7 +20,7 @@ class Recommander:
         return train
 
     def to_rdd(self, df):
-        train_sql = sqlContext.createDataFrame(train)
+        train_sql = sqlContext.createDataFrame(df)
         train_rdd = train_sql.rdd
         return train_rdd
 
