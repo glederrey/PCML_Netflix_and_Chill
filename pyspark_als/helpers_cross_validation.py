@@ -88,7 +88,7 @@ class CrossValidation:
             self.tests_list=self.get_sql_from_pd(self.get_tests_database(data,k_fold_indexes))
         else:
             self.tests_list=self.get_tests_database(data,k_fold_indexes)
-    
+
     def evaluate(self,model,**arg):
         ''' Function that evaluates a model passed as input with some arguments and returns a list
 of rmse errors
