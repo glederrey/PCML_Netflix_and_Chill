@@ -3,7 +3,7 @@ from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
 
 
-def get_predictions_ALS(train,test,spark_context,**arg):
+def get_predictions_ALS(train_set,test_set,spark_context,**arg):
     ''' Function to return the predictions of an ALS model.
 
     @ params:
@@ -17,8 +17,8 @@ def get_predictions_ALS(train,test,spark_context,**arg):
 
     sqlContext=SQLContext(spark_context)
 
-    train_sql=sqlContext.createDataFrame(train).rdd
-    test_sql=sqlContext.createDataFrame(test).rdd
+    train_sql=sqlContext.createDataFrame(train_set).rdd
+    test_sql=sqlContext.createDataFrame(test_set).rdd
     
     # Train the model
     model = ALS.train(train_sql, **arg)
@@ -31,11 +31,11 @@ def get_predictions_ALS(train,test,spark_context,**arg):
     pred_df = predictions.toDF().toPandas()
     
     # Post processing database
-    pred_df['UserID'] = pred_df['_1'].apply(lambda x: x['_1'])
-    pred_df['MovieID'] = pred_df['_1'].apply(lambda x: x['_2'])
+    pred_df['User'] = pred_df['_1'].apply(lambda x: x['_1'])
+    pred_df['Movie'] = pred_df['_1'].apply(lambda x: x['_2'])
     pred_df['Rating'] = pred_df['_2']
     pred_df = pred_df.drop(['_1', '_2'], axis=1)
-    pred_df = pred_df.sort_values(by=['MovieID', 'UserID'])
+    pred_df = pred_df.sort_values(by=['Movie', 'User'])
     pred_df.index = range(len(pred_df))
     return pred_df
 

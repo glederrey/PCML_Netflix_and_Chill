@@ -25,3 +25,4 @@ Corpus containing all methods
 * means.user_mean
 * means.movie_mean
 * means.global_mean
+* als.predictions_ALS
