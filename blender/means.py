@@ -57,14 +57,16 @@ def global_mean(train, test):
     print("[GLOBAL_MEAN] applying")
 
     predictions = pd.DataFrame.copy(test)
+    print('copied pred')
     mean = train['Rating'].mean()
-
+    print('mean computed')
     def line(df):
         df['Rating'] = mean
         return df[['User', 'Movie', 'Rating']]
 
     predictions = predictions.apply(line, axis=1)
-
+    print('after apply')
+        
     # integer for id
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)

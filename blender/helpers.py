@@ -25,8 +25,8 @@ from pyspark.sql import *
 
 def load_csv(filename='../data/data_train.csv'):
     df = pd.read_csv(filename)
-    df['UserID'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
-    df['MovieID'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
+    df['User'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
+    df['Movie'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
     df['Rating'] = df['Prediction']
     df = df.drop(['Id', 'Prediction'], axis=1)
     return df
