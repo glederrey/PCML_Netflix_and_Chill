@@ -30,6 +30,7 @@ class CrossValidationBlending:
         self.predictions={} # Dict to store the predictions for each model with the given parameters
         self.real_values=[] # List to store the real values for each chunk
         self.blended_predictions=[]
+        self.validation_predictions={}
         
         # Initialize the parameters
         self.k=k
@@ -56,7 +57,7 @@ class CrossValidationBlending:
         '''
         self.models[name]=function
 
-    def add_params_for_model(self,model_name,params_dict):
+    def add_params_for_model(self,model_name,params_dict,compute_predictions=True):
         ''' Function to add optional parameters to a model
         
         The function given as input in add_model() may require other parameters a part of train and test.
@@ -66,11 +67,13 @@ class CrossValidationBlending:
         @ params
             - model_name, string - the same passed in add_model
             - params_dict, dictionary containing the optional parameters to be passed to the model function
+            - compute_predictions, if compute automatically the predictions for this set of params
         '''
         if model_name not in self.models:
             print('Warning: Adding parameters for a non-existing model')
         self.params[model_name]=params_dict
-        self.compute_predictions(model_name)
+        if compute_predictions:
+            self.compute_predictions(model_name)
         
     def compute_predictions(self,model):
         ''' Function that computes the predictions for a given model
@@ -133,6 +136,25 @@ class CrossValidationBlending:
         real_values_conc=np.concatenate(self.real_values)
         rmse=np.sqrt(sum((predictions_conc-real_values_conc)**2)/predictions_conc.shape[0])
         return rmse
+    
+    def evaluate_blending_for_validation(self,blending_dict,train,validation):
+        for model_name in blending_dict:
+            if model_name not in self.params:
+                print('Params not available for model',model_name)
+                raise()
+       
+        cont=0
+        for model_name in blending_dict:
+            function=self.models[model_name]
+            arguments=self.params[model_name]
+            predictions_model=function(train,validation,**arguments)
+            if cont==0:
+                predictions=np.array(blending_dict[model_name]*predictions_model)
+                cont+=1
+            else:
+                predictions+=np.array(blending_dict[model_name]*predictions_model)
+        return predictions
+    
         
     def delete_model(self,model_name):
         ''' Function to permanently delete a model and all its data'''
