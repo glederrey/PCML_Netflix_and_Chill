@@ -17,6 +17,7 @@ import pandas as pd
 def user_mean(train, test):
     print("[USER_MEAN] applying")
     predictions = pd.DataFrame.copy(test)
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
     means = train.groupby('User').mean()['Rating']
 
     def line(df):
@@ -37,6 +38,7 @@ def movie_mean(train, test):
     print("[MOVIE_MEAN] applying")
 
     predictions = pd.DataFrame.copy(test)
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
     means = train.groupby('Movie').mean()['Rating']
 
     def line(df):
@@ -57,15 +59,15 @@ def global_mean(train, test):
     print("[GLOBAL_MEAN] applying")
 
     predictions = pd.DataFrame.copy(test)
-    print('copied pred')
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
+
     mean = train['Rating'].mean()
-    print('mean computed')
+
     def line(df):
         df['Rating'] = mean
         return df[['User', 'Movie', 'Rating']]
 
     predictions = predictions.apply(line, axis=1)
-    print('after apply')
         
     # integer for id
     predictions['User'] = predictions['User'].astype(int)
