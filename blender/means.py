@@ -21,10 +21,11 @@ def user_mean(train, test):
     means = train.groupby('User').mean()['Rating']
 
     def line(df):
-        df['Rating'] = means[df['User']]
-        return df[['User', 'Movie', 'Rating']]
+        df['Rating'] = means.loc[df['User'].iloc[0]]
+        return df#[['User', 'Movie', 'Rating']]
 
-    predictions = predictions.apply(line, axis=1)
+    predictions = predictions.groupby('User').apply(line)
+    #predictions = predictions.apply(line, axis=1)
 
     # integer for id
     predictions['User'] = predictions['User'].astype(int)
@@ -42,10 +43,11 @@ def movie_mean(train, test):
     means = train.groupby('Movie').mean()['Rating']
 
     def line(df):
-        df['Rating'] = means[df['Movie']]
-        return df[['User', 'Movie', 'Rating']]
+        df['Rating'] = means.loc[df['Movie'].iloc[0]]
+        return df#[['User', 'Movie', 'Rating']]
 
-    predictions = predictions.apply(line, axis=1)
+    predictions = predictions.groupby('Movie').apply(line)
+    #predictions = predictions.apply(line, axis=1)
 
     # integer for id
     predictions['User'] = predictions['User'].astype(int)
@@ -62,13 +64,15 @@ def global_mean(train, test):
     predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
 
     mean = train['Rating'].mean()
+       
+    #def line(df):
+    #    df['Rating'] = mean
+    #    return df[['User', 'Movie', 'Rating']]
 
-    def line(df):
-        df['Rating'] = mean
-        return df[['User', 'Movie', 'Rating']]
-
-    predictions = predictions.apply(line, axis=1)
-        
+    #predictions = predictions.apply(line, axis=1)
+    
+    predictions.Rating=mean
+    
     # integer for id
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
