@@ -15,6 +15,7 @@ def predictions_ALS(train_set,test_set,spark_context,**arg):
 
     '''
 
+    print('[ALS] applying')
     sqlContext=SQLContext(spark_context)
 
     train_sql=sqlContext.createDataFrame(train_set).rdd
@@ -37,5 +38,6 @@ def predictions_ALS(train_set,test_set,spark_context,**arg):
     pred_df = pred_df.drop(['_1', '_2'], axis=1)
     pred_df = pred_df.sort_values(by=['Movie', 'User'])
     pred_df.index = range(len(pred_df))
+    print('[ALS] done')
     return pred_df
 
