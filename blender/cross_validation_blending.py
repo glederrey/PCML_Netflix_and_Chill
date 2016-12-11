@@ -145,15 +145,15 @@ class CrossValidationBlending:
        
         cont=0
         for model_name in blending_dict:
-            function=self.models[model_name]
-            arguments=self.params[model_name]
-            print(arguments)
-            predictions_model=function(train,validation,**arguments)
-            if cont==0:
-                predictions=np.array(blending_dict[model_name]*predictions_model.Rating)
-                cont+=1
-            else:
-                predictions+=np.array(blending_dict[model_name]*predictions_model.Rating)
+            if blending_dict[model_name] > 0:
+                function=self.models[model_name]
+                arguments=self.params[model_name]
+                predictions_model=function(train,validation,**arguments)
+                if cont==0:
+                    predictions=np.array(blending_dict[model_name]*predictions_model.Rating)
+                    cont+=1
+                else:
+                    predictions+=np.array(blending_dict[model_name]*predictions_model.Rating)
         return predictions
     
         

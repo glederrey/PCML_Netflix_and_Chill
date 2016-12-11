@@ -88,7 +88,8 @@ def movie_mean_deviation_user(train, test):
     deviation = pd.read_csv('../data/deviations_per_users.csv')
     
     def line(df):
-        df['Rating'] = means.loc[int(df['Movie'])] + deviation.loc[int(df['User'])].dev 
+    
+        df['Rating'] = means.loc[int(df['Movie'])] + deviation.loc[int(df['User'])-1].dev 
         return df#[['User', 'Movie', 'Rating']]
         
     predictions = predictions.apply(line, axis=1)
