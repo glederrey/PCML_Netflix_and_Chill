@@ -10,9 +10,8 @@ Mean prediction method, assigning movie/user/global mean to all items
 """
 
 import numpy as np
-from helpers_scipy import *
+from helpers import *
 import pandas as pd
-
 
 def user_mean(train, test):
     print("[USER_MEAN] applying")
@@ -79,3 +78,28 @@ def global_mean(train, test):
 
     print("[GLOBAL_MEAN] done")
     return predictions
+    
+def movie_mean_deviation_user(train, test):
+    print("[MOVIE_MEAN_DEVIATION_USER] applying")
+    
+    predictions = pd.DataFrame.copy(test)
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
+    means = train.groupby('Movie').mean()['Rating']
+    deviation = pd.read_csv('../data/deviations_per_users.csv')
+    
+    def line(df):
+        df['Rating'] = means.loc[int(df['Movie'])] + deviation.loc[int(df['User'])].dev 
+        return df#[['User', 'Movie', 'Rating']]
+        
+    predictions = predictions.apply(line, axis=1)
+    
+    #predictions['Rating'] = np.where(predictions['Rating'] > 5, predictions['Rating'], 5)
+    #predictions['Rating'] = np.where(predictions['Rating'] < 1, predictions['Rating'], 1)
+    
+    predictions['User'] = predictions['User'].astype(int)
+    predictions['Movie'] = predictions['Movie'].astype(int)
+
+    print("[MOVIE_MEAN_DEVIATION_USER] done")
+    return predictions    
+
+    
