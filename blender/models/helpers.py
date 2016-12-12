@@ -16,6 +16,19 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 
+def load_csv(filename='../data/data_train.csv'):
+    df = pd.read_csv(filename)
+    df['User'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
+    df['Movie'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
+    df['Rating'] = df['Prediction']
+    df = df.drop(['Id', 'Prediction'], axis=1)
+    return df
+
+"""
+
+Specific for Scipy
+
+"""
 
 def sp_to_df(sparse):
     row, col, rat = sp.find(sparse)
@@ -93,7 +106,10 @@ def nonzero_mean(matrix):
 
 
 def rmse(predicted, testset):
-    loss = (testset - predicted).data
+    if type(predicted) == list:
+        loss = np.subtract(testset, predicted)
+    else:
+        loss = (testset - predicted).data
     loss_square = np.square(loss)
     mse = np.mean(loss_square)
     rmse = np.sqrt(mse)
