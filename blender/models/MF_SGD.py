@@ -13,7 +13,7 @@ between methods)
 
 import numpy as np
 import scipy.sparse as sp
-from helpers_scipy import *
+from models.helpers import *
 
 
 def matrix_factorization_SGD(df_train, df_test, gamma=0.004, n_features=20, n_iter=20, init_method='global_mean'):
@@ -117,3 +117,5 @@ def predict(item_features, user_features, test_set):
         filled_test[row, col] = pred_matrix[row, col]
 
     return filled_test
+
+

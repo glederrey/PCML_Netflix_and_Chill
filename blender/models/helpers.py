@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 
+
 def load_csv(filename='../data/data_train.csv'):
     df = pd.read_csv(filename)
     df['User'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
@@ -24,11 +25,13 @@ def load_csv(filename='../data/data_train.csv'):
     df = df.drop(['Id', 'Prediction'], axis=1)
     return df
 
+
 """
 
 Specific for Scipy
 
 """
+
 
 def sp_to_df(sparse):
     row, col, rat = sp.find(sparse)

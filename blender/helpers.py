@@ -31,6 +31,10 @@ def load_csv(filename='../data/data_train.csv'):
     return df
 
 
+def load_csv_kaggle():
+    return load_csv('../data/sampleSubmission.csv')
+
+
 def submission_table(original_df, col_userID, col_movie, col_rate):
     def id(row):
         return 'r' + str(int(row[col_userID])) + '_c' + str(int(row[col_movie]))
@@ -52,3 +56,55 @@ def extract_from_original_table(original_df):
     df['Rating'] = df['Prediction']
     df = df.drop(['Id', 'Prediction'], axis=1)
     return df
+
+
+def split(df, cut):
+    size = df.shape[0]
+    keys = list(range(size))
+    np.random.shuffle(keys)
+
+    key_cut = int(size * cut)
+    test_key = keys[:key_cut]
+    train_key = keys[key_cut:]
+
+    test = df.loc[test_key]
+    train = df.loc[train_key]
+
+    return train, test
+
+
+def evaluate(prediction, test_set):
+    test2 = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
+
+    test2['square_error'] = np.square(test2['Rating'] - prediction['Rating'])
+
+    mse = test2['square_error'].mean()
+    rmse = np.sqrt(mse)
+
+    return rmse
+
+
+def signed_evaluate(prediction, test_set):
+    test2 = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
+
+    test2['error'] = (test2['Rating'] - prediction['Rating'])
+
+    mean_error = test2['error'].mean()
+
+    return mean_error
+
+
+def blender(array_df, weights):
+    if np.sum(weights) != 1:
+        print("[WARNING] Pélo... sum(weights) != 1")
+    if len(array_df) != len(weights):
+        print("[WARNING] Pélo... size(array_df) != size(weights)")
+
+    blender = array_df[0].sort_values(['Movie', 'User']).reset_index(drop=True)
+
+    blender['Rating'] = 0.
+
+    for (df, w) in zip(array_df, weights):
+        blender['Rating'] += w * (df.sort_values(['Movie', 'User']).reset_index(drop=True))['Rating']
+
+    return blender

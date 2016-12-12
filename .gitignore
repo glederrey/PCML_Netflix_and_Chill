@@ -1,3 +1,6 @@
+# spark
+metastore_db/
+
 # intelliJ
 .idea/*
 */.idea
