@@ -6,6 +6,12 @@ metastore_db/
 */.idea
 */*/.idea
 
+# latex
+*.aux
+*.log
+*.out
+*.synctex.gz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
