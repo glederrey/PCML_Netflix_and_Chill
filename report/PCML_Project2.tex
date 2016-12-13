@@ -29,8 +29,8 @@
 \title{PCML CS-433: Recommender System}
 
 \author{
-  Gael Lederrey, SCIPER \textcolor{red}{???}, gael.lederrey@epfl.ch \\
-  Stefano Savar\`e, SCIPER \textcolor{red}{???}, stefano.savare@epfl.ch \\
+  Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch \\
+  Stefano Savar\`e, SCIPER 260960, stefano.savare@epfl.ch \\
   Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch\\ \\
   \textit{School of Computer and Communication Sciences, EPF Lausanne, Switzerland}
 }
@@ -103,8 +103,29 @@ An other $1'176'952$ ratings are hidden from us and must be predicted by our rec
 \section{Model selection}
 
 \subsection{Models}
-\subsubsection{Global mean}
-\subsubsection{User/Movie mean}
+\subsubsection{Global mean/median}
+
+The most simple model is to take all the ratings in the train set and apply the mean or the median value. We return this value as the prediction.
+
+\subsubsection{User/Movie mean/median}
+
+Another simple model is to compute the mean or median value for the users or the movies. Then we can return the corresponding value as the prediction.
+
+\subsubsection{Movie mean/median with User mood}
+
+The third set of model uses the mean or median value for each movie. We also compute the ``mood'' of the users this way:
+
+\begin{equation}
+ d_u = \overline{U} - \overline{u} \quad \forall u\in U
+\end{equation}
+where $\overline{U} = \frac{1}{\#U} \sum_{u\in U} \overline{u}$ and $\overline{u}$ being the average rating of the user $u$.
+
+Then, we return the prediction of a user $u$ on a movie $m$:
+\begin{equation}
+ p_{m,u} = \overline{m} + d_u
+\end{equation}
+where $\overline{m}$ is either the mean or the median of the ratings on the movie $m$.
+
 \subsubsection{Matrix Factorization using Stochastic Gradient Descent}
 \subsubsection{Alternativ Least Square}
 \subsubsection{kNN item-based}
@@ -127,7 +148,7 @@ An other $1'176'952$ ratings are hidden from us and must be predicted by our rec
 \section{Discussion}
 
 
-\bibliographystyle{IEEEtran}
-\bibliography{literature}
+%\bibliographystyle{IEEEtran}
+%\bibliography{literature}
 
 \end{document}
