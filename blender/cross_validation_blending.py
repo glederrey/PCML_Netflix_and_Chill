@@ -131,6 +131,11 @@ class CrossValidationBlending:
                     cont+=1
                 else:
                     prediction+=np.array(blending_dict[model_name]*self.predictions[model_name][i].Rating)
+            for i in range(len(prediction)):
+                if prediction[i] > 5:
+                    prediction[i] = 5
+                elif prediction[i] < 1:
+                    prediction[i] = 1
                 
             self.blended_predictions.append(prediction)
         
@@ -147,7 +152,7 @@ class CrossValidationBlending:
        
         cont=0
         for model_name in blending_dict:
-            if blending_dict[model_name] > 0:
+            if blending_dict[model_name] != 0:
                 function=self.models[model_name]
                 arguments=self.params[model_name]
                 predictions_model=function(train,validation,**arguments)
@@ -157,6 +162,11 @@ class CrossValidationBlending:
                 else:
                     predictions+=np.array(blending_dict[model_name]*predictions_model.Rating)
                 os.system('rm metastore_db/*.lck')
+        for i in range(len(predictions)):
+            if predictions[i] > 5:
+                predictions[i] = 5
+            elif predictions[i] < 1:
+                predictions[i] = 1
         return predictions
     
         

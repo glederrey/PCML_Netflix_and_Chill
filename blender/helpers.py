@@ -17,9 +17,9 @@ import numpy as np
 import os
 import sys
 
-from pyspark.mllib.recommendation import ALS
-from pyspark import *
-from pyspark.sql import *
+#from pyspark.mllib.recommendation import ALS
+#from pyspark import *
+#from pyspark.sql import *
 
 
 def load_csv(filename='../data/data_train.csv'):
