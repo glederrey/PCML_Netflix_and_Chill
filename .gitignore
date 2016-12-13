@@ -1,5 +1,6 @@
 # spark
-metastore_db/
+blender/metastore_db/*
+metastore_db/*
 
 # intelliJ
 .idea/*

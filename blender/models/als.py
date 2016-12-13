@@ -3,7 +3,7 @@ from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
 
 
-def predictions_ALS(train_set,test_set,spark_context,**arg):
+def predictions_ALS(train_set,test_set,spark_context, **arg):
     ''' Function to return the predictions of an ALS model.
 
     @ params:
