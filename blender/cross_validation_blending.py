@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from cross_validation import KFoldIndexes
 import itertools
+import os
 
 class CrossValidationBlending:
     ''' Class to cross validate a blended model. The different submodels should have a predefined set of parameters.
@@ -108,6 +109,7 @@ class CrossValidationBlending:
                 
                 self.real_values.append(test.Rating)
                 self.predictions[model_name].append(function(train,test,**arguments))
+                os.system('rm metastore_db/*.lck')
             
     def evaluate_blending(self,blending_dict):        
         ''' Evaluate a particular blended model
@@ -154,6 +156,7 @@ class CrossValidationBlending:
                     cont+=1
                 else:
                     predictions+=np.array(blending_dict[model_name]*predictions_model.Rating)
+                os.system('rm metastore_db/*.lck')
         return predictions
     
         
