@@ -14,10 +14,17 @@ between methods)
 import numpy as np
 import scipy.sparse as sp
 from models.helpers import *
+from models.means import *
 
 
-def matrix_factorization_SGD(df_train, df_test, gamma=0.004, n_features=20, n_iter=20, init_method='global_mean'):
+def matrix_factorization_SGD(df_train, df_test, **arg):
     """matrix factorization by SGD."""
+    
+    # Get all the parameters in arg
+    gamma = arg['gamma']
+    n_features = arg['n_features']
+    n_iter = arg['n_iter']
+    init_method = arg['init_method']
 
     # convert to sparse matrices
     train = df_to_sp(df_train)
