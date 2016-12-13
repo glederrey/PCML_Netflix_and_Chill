@@ -34,6 +34,8 @@ def collaborative_filtering(train, test, **arg):
     
     pred = []
     
+    df_return = test.copy()
+    
     for i in range(len(test)):
         dd = test.iloc[i]
         val = pred_mat[dd.Movie][dd.User]
@@ -43,10 +45,10 @@ def collaborative_filtering(train, test, **arg):
             val = 1
         pred.append(val)
         
-    test.Rating = pred
+    df_return.Rating = pred
     
     print('[COLLABORATIVE FILTERING] done')
-    return test
+    return df_return
     
     
 def rmse_cf(y, yhat):
