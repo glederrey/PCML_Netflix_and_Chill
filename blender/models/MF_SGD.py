@@ -9,22 +9,60 @@
 Matrix Factorization using Stochastic Gradient Descent (MF-SGD)
 Works with scipy.sparse matrices but take pandas.DataFrame as argument and convert them (in order to keep consistency
 between methods)
+
+
 """
 
 import numpy as np
 import scipy.sparse as sp
 from models.helpers import *
 from models.means import *
+from rescaler import Rescaler
 
 
-def matrix_factorization_SGD(df_train, df_test, **arg):
-    """matrix factorization by SGD."""
+def matrix_factorization_SGD_rescaling(df_train, df_test, **kwargs):
+    """
+    Matrix factorization using SGD.
+    First do a rescaling of the user in a way that they all have the same mean of rating.
+    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
+    appreciation of a movie.
+
+    :param df_train:
+    :param df_test:
+    :param kwargs:
+        gamma (float): regularization parameter
+        n_features (int): number of features for matrices
+        n_iter (int): number of iterations
+        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
+    :return:
+    """
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
+
+    prediction_normalized = matrix_factorization_SGD(df_train_normalized, df_test, **kwargs)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
+
+
+def matrix_factorization_SGD(df_train, df_test, **kwargs):
+    """
+    Matrix factorization using SGD.
+
+    :param df_train:
+    :param df_test:
+    :param kwargs:
+        gamma (float): regularization parameter
+        n_features (int): number of features for matrices
+        n_iter (int): number of iterations
+        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
+    :return:
+    """
     
     # Get all the parameters in arg
-    gamma = arg['gamma']
-    n_features = arg['n_features']
-    n_iter = arg['n_iter']
-    init_method = arg['init_method']
+    gamma = kwargs['gamma']
+    n_features = kwargs['n_features']
+    n_iter = kwargs['n_iter']
+    init_method = kwargs['init_method']
 
     # convert to sparse matrices
     train = df_to_sp(df_train)
