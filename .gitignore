@@ -1,6 +1,7 @@
 # spark
 blender/metastore_db/*
 metastore_db/*
+blender/checkpoint/*
 
 # intelliJ
 .idea/*
