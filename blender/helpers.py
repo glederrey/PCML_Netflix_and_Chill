@@ -95,8 +95,6 @@ def signed_evaluate(prediction, test_set):
 
 
 def blender(array_df, weights):
-    if np.sum(weights) != 1:
-        print("[WARNING] Pélo... sum(weights) != 1")
     if len(array_df) != len(weights):
         print("[WARNING] Pélo... size(array_df) != size(weights)")
 
