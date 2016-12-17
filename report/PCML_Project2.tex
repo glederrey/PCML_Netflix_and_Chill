@@ -157,11 +157,11 @@ $X \in \mathbb{R}^{D \times N}$, we aim to find two matrixes $W \in \mathbb{R}^{
 \begin{equation}
 \label{eq:functional}
 E = \frac{1}{2} \sum_{\substack{d=1,...,D \\n=1,...,N}} 
-\bigg( x_{dn} - \big( WZ^T \big)_{dn} \bigg) ^2 +\frac{\lambda_w}{2}\|W\|^2 + 
-\frac{\lambda_z}{2}\|Z\|^2
+\bigg( x_{dn} - \big( WZ^T \big)_{dn} \bigg) ^2 +\frac{\lambda}{2}\|W\|^2 + 
+\frac{\lambda}{2}\|Z\|^2
 \end{equation} 
 is minimized. $K$ is a parameter,
-corresponding of the number of the \textit{latent factors}; $\lambda_w$ and $\lambda_z$ are scalars
+corresponding of the number of the \textit{latent factors}; $\lambda$ is a scalar 
 that weight the regularization terms.
 
 Different techniques have been deployed to solve this minimization problem. In this Subsection we
@@ -173,6 +173,17 @@ element of the summation, randomly chosen. The update process then follows the s
 gradient descent.
 An almost certain convergence to a local minimum is guaranteed under not restrictive hypothesis.
 
+We implemented two version of the SGD methods:
+\begin{itemize}
+\item An implementation from scratch, with the help of the Scipy library to deal with sparse
+matrixes.
+\item An implementation based on the PyFM Python library, a wrapper of the C++ library libFM
+\cite{rendle:tist2012}, one of
+the more advanced matrix factorization libraries.
+\end{itemize}
+Through a cross validation process we chosed the best values for the paramester $K$, $\lambda$ and
+the number of iterations. The results that we obtained will be presented in Section
+\ref{sec:model_bench}.
 
 \subsubsection{Matrix Factorization using Alternating Least Square (ALS)}
 ALS is one of the main alternatives to the SGD to solve the problem \ref{eq:functional}.
@@ -186,8 +197,6 @@ Spark allows to specify the parameters $K$, the number of iterations and $\lambd
 cross validation to choose the best parameters, whose results will be discussed in Section 
 \ref{sec:model_bench}.
 
-\subsubsection{kNN item-based}
-\subsubsection{Pareto Dominance and Collaborative Filtering Nearest Neighbors}
 
 \subsection{Models benchmark}
 \label{sec:model_bench}
@@ -207,10 +216,11 @@ Movie mean					& 1.03045 \\
 Movie mean (mood norm.)		& 0.99653 \\
 Movie median					& 1.09963 \\
 Movie median (mood norm.)		& 1.05793 \\
-MF-SGD 						& 1.00052 \\
+%MF-SGD 						& 1.00052 \\
 MF-SGD (mood normalization) 		& 0.99981 \\
 ALS							& 0.98861 \\
 Collab. Filtering					& 1.02733 \\
+PyFM                        & ADD VALUE \\
 \hline
 
 
@@ -237,28 +247,29 @@ The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Priz
 Model & weight & parameters\\
 \hline 
 \hline
-Global mean					& -0.64503			& -	\\
-Global median 					& 4.16579				& -	\\
-User mean 					& -3.67733			& - \\
-User median					& -0.00498			& - \\
-Movie mean					& 0.58294				& - \\
-Movie mean (mood norm.)		& -0.43266			& - \\
-Movie median					& -4.29733			& - \\
-Movie median (mood norm.)		& 4.29873				& - \\
-MF-SGD 						& -0.03862			& \specialcell[t]{$\gamma = 0.004$ \\
-													 features = 20 \\
-													 iterations = 20 \\
-													 initial matrix = global\_mean} \\
-MF-SGD (mood normalization) 		& -0.06728			& \specialcell[t]{$\gamma = 0.004$ \\
+Global mean					& 2.87634			& -	\\
+Global median 					& 0.88256				& -	\\
+User mean 					& -3.81181			& - \\
+User median					& 0.00362			& - \\
+Movie mean					& -1.57271				& - \\
+Movie mean (mood norm.)		& 1.65276			& - \\
+Movie median					& -2.27553			& - \\
+Movie median (mood norm.)		& 2.27933				& - \\
+%MF-SGD 						& -0.03862			& \specialcell[t]{$\gamma = 0.004$ \\
+%													 features = 20 \\
+%													 iterations = 20 \\
+%													 initial matrix = global\_mean} \\
+MF-SGD (mood normalization) 		& -0.16857			& \specialcell[t]{$\lambda = 0.004$ \\
 													 features = 20 \\
 													 iterations = 20\\
 													 initital matrix = global\_mean} \\
-ALS							& 0.89273				& \specialcell[t]{$\lambda = 0.081$ \\
+ALS							& 0.75256				& \specialcell[t]{$\lambda = 0.081$ \\
 													 rank = 8 \\
 													 iterations = 24} \\
 
-Collab. Filtering					& 0.07109				& \specialcell[t]{$\alpha = 19$ \\
+Collab. Filtering					& 0.04356				& \specialcell[t]{$\alpha = 19$ \\
 													 features = 20} \\
+PyFM                        & 0.30050 & ADD PARAMS \\
 \hline
 
 \end{tabular}

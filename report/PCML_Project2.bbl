@@ -21,6 +21,10 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{rendle:tist2012}
+S.~Rendle, ``Factorization machines with {libFM},'' \emph{ACM Trans. Intell.
+  Syst. Technol.}, vol.~3, no.~3, pp. 57:1--57:22, 2012.
+
 \bibitem{BellKore_netflix}
 Y.~Koren, ``The bellkor solution to the netflix grand prize,'' 2009.
 
