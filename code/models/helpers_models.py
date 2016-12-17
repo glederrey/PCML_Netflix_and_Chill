@@ -183,6 +183,11 @@ def counter(matrix, axis):
 
 
 def nonzero_row_mean(matrix):
+    ''' Function that returns the mean for each row in a Scipy sparse matrix
+        
+        @ returns
+            - res, a dictionary containing the mean for each row
+    '''
     size = matrix.shape[0]
     res = np.zeros(size)
     sum_ = matrix.sum(axis=1)
@@ -199,6 +204,8 @@ def nonzero_row_mean(matrix):
 
 
 def nonzero_column_mean(matrix):
+    ''' Function that 
+    '''
     size = matrix.shape[1]
     res = np.zeros(size)
     sum_ = matrix.sum(axis=0)
