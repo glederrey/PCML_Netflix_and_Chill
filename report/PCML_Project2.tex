@@ -17,6 +17,9 @@
 % math
 \usepackage{amsmath}
 
+% math symbols
+\usepackage{amssymb}
+
 % url
 \usepackage{hyperref}
 
@@ -113,7 +116,7 @@ Because of mood/education//habits users having the same appreciation of a movie 
 
 \begin{figure}[htbp] %-------------- FIGURE -------------
   \centering
-  \includegraphics[width=\columnwidth]{img/deviation_mean}
+  \includegraphics[width=\columnwidth]{img/Deviation_mean}
   \caption{Difference of mean rating per user compared with overall mean.}
   \vspace{-3mm}
   \label{mood}
@@ -146,12 +149,48 @@ Then, we return the prediction of a user $u$ on a movie $m$:
 \end{equation}
 where $\overline{m}$ is either the mean or the median of the ratings on the movie $m$.
 
-\subsubsection{Matrix Factorization using Stochastic Gradient Descent}
-\subsubsection{Alternativ Least Square}
+\subsubsection{Matrix Factorization using Stochastic Gradient Descent (SGD)}
+Matrix factorization techniques proved to be one of the most effective strategies to implement 
+recommender systems. Given $D$ items, $N$ users and the corresponding rating matrix 
+$X \in \mathbb{R}^{D \times N}$, we aim to find two matrixes $W \in \mathbb{R}^{D \times K}$ and $Z
+\in \mathbb{R}^{N \times K}$ such that the quantity 
+\begin{equation}
+\label{eq:functional}
+E = \frac{1}{2} \sum_{\substack{d=1,...,D \\n=1,...,N}} 
+\bigg( x_{dn} - \big( WZ^T \big)_{dn} \bigg) ^2 +\frac{\lambda_w}{2}\|W\|^2 + 
+\frac{\lambda_z}{2}\|Z\|^2
+\end{equation} 
+is minimized. $K$ is a parameter,
+corresponding of the number of the \textit{latent factors}; $\lambda_w$ and $\lambda_z$ are scalars
+that weight the regularization terms.
+
+Different techniques have been deployed to solve this minimization problem. In this Subsection we
+will present the Stocastic Gradient Descent method, while in the next one we will explain the
+Alternating Least Square optimization. 
+The Stochastic Gradient Descent method is a faster variant of the standard gradient descent
+optimization. The gradient of the functional \ref{eq:functional} is computed only on a single
+element of the summation, randomly chosen. The update process then follows the same rules of the batch
+gradient descent.
+An almost certain convergence to a local minimum is guaranteed under not restrictive hypothesis.
+
+
+\subsubsection{Matrix Factorization using Alternating Least Square (ALS)}
+ALS is one of the main alternatives to the SGD to solve the problem \ref{eq:functional}.
+It is an iterative algorithm consisting in alternately fixing one of the two matrixes $W$ or $Z$,
+while optimizing the problem \ref{eq:functional} with respect to the other matrix.
+The optimization problem at each iteration is much easier to solve compared to the one solved by the
+SGD. A simple least squares technique can be exploited.
+
+For speed reasons we decided to use the open source framework Apache Spark to implement this method.
+Spark allows to specify the parameters $K$, the number of iterations and $\lambda$. We perform a
+cross validation to choose the best parameters, whose results will be discussed in Section 
+\ref{sec:model_bench}.
+
 \subsubsection{kNN item-based}
 \subsubsection{Pareto Dominance and Collaborative Filtering Nearest Neighbors}
 
 \subsection{Models benchmark}
+\label{sec:model_bench}
 
 \begin{table}[htbp]
 \centering
