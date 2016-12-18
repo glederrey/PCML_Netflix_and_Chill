@@ -108,7 +108,7 @@ One of the first step before starting learning from data is to ensure that they 
 
 Even free of spammers, data can still contains \textbf{inactive users}, i.e. users which subscribed to a plateform but never use it or never rate movies. If they are in too big number compared with active user, they can disturb learning algorithms. Figure (\ref{number_ratings}) shows histogram of number of movies rated by users and confirm us the good participation of the users.
 
-\subsection{User "moods"}
+\subsection{User "moods" (deviation)}
 
 Because of mood/education//habits users having the same appreciation of a movie can rate it differently. Indeed, we show in figure (\ref{mood}) that some users systematically rate lower/higher that others. It's important to take this effect into account in both evaluation of a movie and recommendation for the user and proceed to a normalization of the ratings.
 
@@ -131,7 +131,7 @@ The most simple model is to take all the ratings in the train set and apply the 
 
 Another simple model is to compute the mean or median value for the users or the movies.
 
-\subsection{Movie mean/median with User mood (2 models)}
+\subsection{Movie mean/median with normalized user moods (2 models)}
 
 The third set of model uses the mean or median value for each movie. We also compute the ``mood'' of the users this way:
 
@@ -211,11 +211,11 @@ The number of iterations was fixed. The two other parameters were chosen with th
 
 \subsection{Collaborative Filtering}
 
-This algorithm is nothing more than another implementation 
+This algorithm is nothing more than another implementation \textcolor{red}{An other implementation of what?}
 
 \section{Blending}
 
-The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize} explain in its paper that its solution was obtained by blending a hundred of different models. \cite{BellKore_netflix} Without having the same amout of models, we proceed the same to obtain our final solution. We performe a weighted sum that we optimize using \textbf{Nelder-Mead} method provided by \texttt{scipy.optimize} library. Initial weights are set to $0.1$ for each model.
+The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred of different models. \cite{BellKore_netflix} Without having the same amout of models, we proceed the same to obtain our final solution. We performe a weighted sum that we optimize using \textbf{Nelder-Mead} method provided by \texttt{scipy.optimize} library. Initial weights are set to $0.1$ for each model.
 
 %========================
 \section{Result}
@@ -298,6 +298,13 @@ The models were not tested individually on the Kaggle Public dataset. But the bl
 \section{Discussion}
 
 We can first discuss about the models. The models we used are quite simple. Therefore, using more complex algorithms instead of these would help a bit more. However with our blending method, we can use as many algorithms as we want. Indeed, since we're using an optimization algorithm, the optimization can decide itself if it should discard a model or not. However there's some risk to overfit the data. And it is happening a little bit. Indeed, the RMSE on the validations sets is a bit smaller than the RMSE on Kaggle. 
+
+\subsubsection{Why keeping model with and without normalization?}
+
+It should be legitimate to ask why are we keeping both normalized and unnormalized model for median/mean. Looking at the coefficient give a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized model. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
+
+
+
 
 
 
