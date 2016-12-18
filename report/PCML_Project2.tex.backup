@@ -245,7 +245,8 @@ Movie median			& -2.27553	& - \\
 Movie median (mood norm.)	& 2.27933	& - \\
 MF-SGD (mood normalization)	& -0.16857	& \specialcell[t]{$\lambda = 0.004$ \\
 							features = 20 \\
-							iterations = 20} \\
+							iterations = 20\\
+							initital\_matrix = global\_mean} \\
 ALS				& 0.75256	& \specialcell[t]{$\lambda = 0.081$ \\
 							rank = 8 \\
 							iterations = 24} \\
@@ -253,7 +254,7 @@ Collab. Filtering		& 0.04356	& \specialcell[t]{$\alpha = 19$ \\
 							features = 20} \\
 PyFM				& 0.30050 	& \specialcell[t]{num\_factors = 20\\
 							num\_iter = 100 \\
-							learning\_rate = 0.001 \\} \\
+							initial\_learning\_rate = 0.001 \\} \\
 \hline
 
 \end{tabular}
@@ -297,7 +298,7 @@ The models were not tested individually on the Kaggle Public dataset. But the bl
 %========================
 \section{Discussion}
 
-We can first discuss about the models. The models we used are quite simple. Therefore, using more complex algorithms instead of these would help a bit more. However with our blending method, we can use as many algorithms as we want. Indeed, since we're using an optimization algorithm, the optimization can decide itself if it should discard a model or not. However there's some risk to overfit the data. And it is happening a little bit. Indeed, the RMSE on the validations sets is a bit smaller than the RMSE on Kaggle. 
+We can first discuss about the models. The models we used are quite simple. Therefore, using more complex algorithms instead of these would help a bit more. 
 
 
 
