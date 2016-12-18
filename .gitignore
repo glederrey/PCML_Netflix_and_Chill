@@ -116,3 +116,13 @@ notebooks/metastore_db/*
 */*.pickle
 */*/*.pickle
 
+# Remove stuff with report
+report/*.log
+report/*.out
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.tex.backup
+report/*.tex.swp
+
+
