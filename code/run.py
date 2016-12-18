@@ -20,8 +20,6 @@ from models.als import predictions_ALS
 from helpers import load_csv, blender
 from pyspark import SparkContext, SparkConf
 
-import threading
-import time
 
 
 def main():
@@ -30,6 +28,8 @@ def main():
     print("============")
 
     print("[INFO] Start Spark")
+
+
     # configure and start spark
     conf = (SparkConf()
             .setMaster("local")
@@ -37,6 +37,12 @@ def main():
             .set("spark.executor.memory", "1g")
             )
     sc = SparkContext(conf=conf)
+
+    print("========================================")
+    print("[INFO] Start recommender system modeling")
+    print("========================================")
+
+
 
     # test if spark works
     if sc is not None:
@@ -51,10 +57,6 @@ def main():
     print("[INFO] Load data set")
     train = load_csv('data/data_train.csv')
     test = load_csv('data/sampleSubmission.csv')
-
-    print("========================================")
-    print("[INFO] Start recommender system modeling")
-    print("========================================")
 
     # dictionary containing predictions
     models = {}

@@ -52,6 +52,7 @@ The predictions will be written in a file `predictions.py`
 
 ## Possible issues
 
+### Spark conflict with Jupyter iPython Notebok
 ```
 jupyter: '.../run.py' is not a Jupyter command
 ```
@@ -62,3 +63,12 @@ Unset your local variable `PYSPARK_DRIVER_PYTHON` in order to fix it:
 ```
 unset PYSPARK_DRIVER_PYTHON
 ```
+
+### Spark conflict with cache
+```
+Caused by: org.apache.spark.SparkException: File .../run.py exists and does not match contents of file: .../run.py
+```
+
+Spark encounters some error while trying to reuse file previously stored in its own cache.
+In order to avoid this clear the folders `./__pycache__` and `./models/__pycache__`if you want to 
+run the project twice. (Or run the provided shell script `clean_cache.sh`)
