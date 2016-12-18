@@ -6,7 +6,7 @@
 #
 # Distributed under terms of the MIT license.
 """
-median prediction method, assigning movie/user/global median to all items
+Median prediction method, assigning movie/user/global median to all items
 """
 
 import numpy as np
@@ -14,16 +14,24 @@ from helpers import *
 import pandas as pd
 
 def user_median(train, test):
+    ''' Function to assign the user median to each non labelled element in the test
+    
+    @ params
+        - train, pandas dataframe with columns User, Movie, Rating
+        - test, pandas dataframe with columns User, Movie
+    @ returns
+        - predictions, pandas dataframe with columns User, Movie, Rating
+    '''
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
     medians = train.groupby('User').median()['Rating']
 
     def line(df):
         df['Rating'] = medians.loc[df['User'].iloc[0]]
-        return df#[['User', 'Movie', 'Rating']]
-
+        return df
+    
     predictions = predictions.groupby('User').apply(line)
-    #predictions = predictions.apply(line, axis=1)
+    
 
     # integer for id
     predictions['User'] = predictions['User'].astype(int)
@@ -33,7 +41,14 @@ def user_median(train, test):
 
 
 def movie_median(train, test):
-
+    ''' Function to assign the item median to each non labelled element in the test
+    
+    @ params
+        - train, pandas dataframe with columns User, Movie, Rating
+        - test, pandas dataframe with columns User, Movie
+    @ returns
+        - predictions, pandas dataframe with columns User, Movie, Rating
+    '''
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
     medians = train.groupby('Movie').median()['Rating']
@@ -53,7 +68,14 @@ def movie_median(train, test):
 
 
 def global_median(train, test):
-
+    ''' Function to assign the global median to each non labelled element in the test
+    
+    @ params
+        - train, pandas dataframe with columns User, Movie, Rating
+        - test, pandas dataframe with columns User, Movie
+    @ returns
+        - predictions, pandas dataframe with columns User, Movie, Rating
+    '''
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
 
@@ -74,7 +96,14 @@ def global_median(train, test):
     return predictions
     
 def movie_median_deviation_user(train, test):
-
+    ''' Function to assign to each non labelled element in the test the item median with a deviation term for each user
+    
+    @ params
+        - train, pandas dataframe with columns User, Movie, Rating
+        - test, pandas dataframe with columns User, Movie
+    @ returns
+        - predictions, pandas dataframe with columns User, Movie, Rating
+    '''
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
     medians = train.groupby('Movie').median()['Rating']

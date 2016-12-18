@@ -7,7 +7,7 @@
 # Distributed under terms of the MIT license.
 
 """
-Helpers function to work with scipy.sparse matrices
+Helpers functions to work with scipy.sparse matrices
 Used for matrix factorization using SGD (MF-SGD)
 """
 
@@ -204,7 +204,10 @@ def nonzero_row_mean(matrix):
 
 
 def nonzero_column_mean(matrix):
-    ''' Function that 
+    ''' Function that computes the mean of each non zero column of the sparse matrix given as input
+    
+    @ returns
+        - a Numpy vector 
     '''
     size = matrix.shape[1]
     res = np.zeros(size)
@@ -219,7 +222,16 @@ def nonzero_column_mean(matrix):
 
 
 def compute_error(data, user_features, item_features, nz):
-    """compute the loss (RMSE) of the prediction of nonzero elements."""
+    """ Function that computes the loss (RMSE) of the prediction of nonzero elements. It's intended to be used in MF algorithm for evaluation
+    
+    @ params
+        - data, the input matrix
+        - user_features, the user matrix in MF algorithm
+        - item_features, the item matrix in MF algorithm
+        - nz, non_zero elements pair. It's a list of pairs, containing the indexes of the non-zero items
+    @ returns
+        - the RMSE between data and item_features*user_features^T
+    """
 
     square_errors = []
     for i, j in nz:

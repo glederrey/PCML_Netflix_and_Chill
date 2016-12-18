@@ -5,7 +5,17 @@ import random
 from sklearn.linear_model import Ridge
 
 def collaborative_filtering(train, test, **arg):
-
+    ''' Function to compute predictions using the ALS method
+    
+    @ params
+        - train, test, the 2 input Pandas dataframes
+        - movie_features, how many movie features to consider
+        - alpha, parameter for the Ridge Regression in the iterative algorithm
+    
+    @ returns
+        - a Pandas df containing the predictions in the Rating column
+    '''
+    
     # Rating of the train set
     rating = train.pivot(index='User', columns='Movie').Rating
     
@@ -50,11 +60,33 @@ def collaborative_filtering(train, test, **arg):
     
     
 def rmse_cf(y, yhat):
+    ''' Function that computes the RMSE between 2 vectors
+    
+    @ params
+        - y, yhat, the 2 input vectors
+    '''
     err = (y - yhat) ** 2
     return np.sqrt(np.mean(err.mean(skipna=True)))
     
 ## Fit the user preferences (U)
 def fitU(U, M, train, rating, error_history, bestFit, alpha, users):  
+    ''' Function to fit the user matrix U in ALS
+    
+    @ params
+        - U, user matrix in ALS
+        - M, movie matrix in ALS
+        - train, training Pandas database
+        - rating, vector of known ratings, the algorithm will predict the corresponding ratings
+        - error_history, list containing the errors of all the iterations
+        - bestFit, dictionary with keys = {'U', 'M', 'error'}
+        - alpha, parameter in the Ridge Regression
+        - users, list of all the users
+        
+    @ returns
+        - U
+        - delta
+    '''
+    
     ## Join ratings and movie features
     Udata = train.set_index('Movie').join(M).sort('User').set_index('User')
     ## Function for fitting individual users
@@ -84,6 +116,22 @@ def fitU(U, M, train, rating, error_history, bestFit, alpha, users):
 
 ## Fit the movie features (M)
 def fitM(U, M, train, rating, error_history, bestFit, alpha, movies):
+    ''' Function to fit the movie matrix M in ALS
+    
+    @ params
+        - U, user matrix in ALS
+        - M, movie matrix in ALS
+        - train, training Pandas database
+        - rating, vector of known ratings, the algorithm will predict the corresponding ratings
+        - error_history, list containing the errors of all the iterations
+        - bestFit, dictionary with keys = {'U', 'M', 'error'}
+        - alpha, parameter in the Ridge Regression
+        - movies, list of all the movies
+        
+    @ returns
+        - U
+        - delta
+    '''
     ## Join ratings and user preferences
     Mdata = train.set_index('User').join(U).sort('Movie').set_index('Movie')
     ## Function for fitting individual movies
@@ -108,15 +156,34 @@ def fitM(U, M, train, rating, error_history, bestFit, alpha, movies):
         bestFit['error'] = error
     return M, delta
 
-## Predict the ratings (U dot M)
 def predict(U, M):
+    ''' Function to predict the ratings given the matrixes U and M
+    
+    @ returns
+        - the vector of predictions
+    '''
     pred = U.dot(M.T)
     pred[pred > 5] = 5
     pred[pred < 1] = 1
     return pred
 
-## Repeat the optimization until convergence
 def fitUM(bestFit, alpha, U0, M0, train, rating, users, movies, tol=0.05):
+    ''' Function that repeat the ALS optimization up to convergence
+    
+    @ params
+        - bestFit, dictionary with keys = {'U', 'M', 'error'}
+        - alpha, Ridge Regression regularizer
+        - U0, starting matrix U
+        - M0, starting matrix M
+        - train, training Pandas database
+        - rating, vector of known ratings, the algorithm will predict the corresponding ratings
+        - users, list of all the users
+        - movies, list of all the items
+        - tol, convergence tolerance
+    @ returns 
+        - error_history, a list containing all the errors
+        
+    '''
     U, M = U0.copy(), M0.copy()
     error_history = []
     U, delta = fitU(U, M, train, rating, error_history, bestFit, alpha, users)
