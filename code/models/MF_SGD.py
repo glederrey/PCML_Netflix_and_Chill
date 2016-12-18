@@ -15,7 +15,7 @@ between methods)
 
 import numpy as np
 import scipy.sparse as sp
-from models.helpers import *
+from models.helpers_models import *
 from models.means import *
 from rescaler import Rescaler
 

@@ -78,7 +78,7 @@ def movie_median_deviation_user(train, test):
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
     medians = train.groupby('Movie').median()['Rating']
-    deviation = pd.read_csv('../data/deviations_per_users.csv')
+    deviation = pd.read_csv('data/deviations_per_users.csv')
     
     def line(df):
         df['Rating'] = medians.loc[int(df['Movie'])] + deviation.loc[int(df['User']-1)].dev 

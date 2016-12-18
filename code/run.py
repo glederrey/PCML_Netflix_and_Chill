@@ -20,6 +20,9 @@ from models.als import predictions_ALS
 from helpers import load_csv, blender
 from pyspark import SparkContext, SparkConf
 
+import threading
+import time
+
 
 def main():
     print("============")
@@ -46,7 +49,6 @@ def main():
     sc.setLogLevel("ERROR")
 
     print("[INFO] Load data set")
-
     train = load_csv('data/data_train.csv')
     test = load_csv('data/sampleSubmission.csv')
 
@@ -86,11 +88,11 @@ def main():
 
     print("[INFO] Modeling: Matrix Factorization using SGD")
     models['mf_sgd'] = matrix_factorization_SGD(train, test, gamma=0.004,
-                                           n_features=20, n_iter=20, init_method='global_mean')
+                                                n_features=20, n_iter=20, init_method='global_mean')
 
     print("[INFO] Modeling: ALS")
     models['als'] = predictions_ALS(train, test, spark_context=sc, rank=8,
-                               lambda_=0.081, iterations=24)
+                                    lambda_=0.081, iterations=24)
 
     weights = {'user_mean': -3.6773325300577424,
                'mf_sgd_rescale': -0.067287844047187018,

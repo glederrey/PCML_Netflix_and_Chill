@@ -152,12 +152,14 @@ Matrix factorization techniques proved to be one of the most effective strategie
 recommender systems. Given $D$ items, $N$ users and the corresponding rating matrix 
 $X \in \mathbb{R}^{D \times N}$, we aim to find two matrixes $W \in \mathbb{R}^{D \times K}$ and $Z
 \in \mathbb{R}^{N \times K}$ such that the quantity 
-\begin{equation}
+
+\begin{multline}
 \label{eq:functional}
 E = \frac{1}{2} \sum_{\substack{d=1,...,D \\n=1,...,N}} 
-\bigg( x_{dn} - \big( WZ^T \big)_{dn} \bigg) ^2 +\frac{\lambda}{2}\|W\|^2 + 
-\frac{\lambda}{2}\|Z\|^2
-\end{equation} 
+\bigg( x_{dn} - \big( WZ^T \big)_{dn} \bigg) ^2 + \\ 
+\frac{\lambda}{2}\|W\|^2 + \frac{\lambda}{2}\|Z\|^2
+\end{multline} 
+
 is minimized. $K$ is a parameter,
 corresponding of the number of the \textit{latent factors}; $\lambda$ is a scalar 
 that weight the regularization terms.
@@ -191,11 +193,10 @@ cross validation to choose the best parameters, whose results will be discussed 
 
 We implemented two version of the SGD methods:
 \begin{itemize}
-\item An implementation from scratch, with the help of the Scipy library to deal with sparse
-matrixes.
+\item An implementation from scratch, using \texttt{scipy.sparse} matrices library.
 \item An implementation based on the PyFM Python library, a wrapper of the C++ library libFM
 \cite{rendle:tist2012}, one of
-the more advanced matrix factorization libraries.
+the most advanced matrix factorization libraries.
 \end{itemize}
 
 PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012}, one of the more advanced matrix factorization libraries. It can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD \ref{sec:mf-sgd}. 
@@ -251,9 +252,9 @@ ALS				& 0.75256	& \specialcell[t]{$\lambda = 0.081$ \\
 							iterations = 24} \\
 Collab. Filtering		& 0.04356	& \specialcell[t]{$\alpha = 19$ \\
 							features = 20} \\
-PyFM				& 0.30050 	& \specialcell[t]{num\_factors = 20\\
-							num\_iter = 100 \\
-							learning\_rate = 0.001 \\} \\
+PyFM				& 0.30050 	& \specialcell[t]{factors = 20\\
+							iterations = 100 \\
+							learning rate = 0.001 \\} \\
 \hline
 
 \end{tabular}
@@ -292,7 +293,7 @@ blending			& 0.96191 \\
   \label{benchmark}
 \end{table}
 
-The models were not tested individually on the Kaggle Public dataset. But the blending gives a result of 0.97788. 
+The models were not tested individually on the Kaggle Public dataset. But the blending gives a result of \textcolor{red}{0.97788}. 
 
 %========================
 \section{Discussion}
