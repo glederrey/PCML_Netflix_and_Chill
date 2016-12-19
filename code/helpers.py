@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
 #
 # Distributed under terms of the MIT license.
 
 
 """
 Main helpers functions
-HERE TO INSERT METHOD SUCH AS LOAD_DATA, WRITE_PREDICTION, ....
 """
 
 import pandas as pd
@@ -17,12 +17,24 @@ import numpy as np
 import os
 import sys
 
-#from pyspark.mllib.recommendation import ALS
-#from pyspark import *
-#from pyspark.sql import *
+
+# from pyspark.mllib.recommendation import ALS
+# from pyspark import *
+# from pyspark.sql import *
 
 
 def load_csv(filename='data/data_train.csv'):
+    """
+    Function to load as a pandas dataframe a csv dataset in the standard format
+
+    Args:
+        filename (str): the csv file to read. It should be a table with columns Id, Prediction,
+            with Id in the form r44_c1 where 44 is the user and 1 is the item
+
+    Returns:
+        pandas.DataFrame: ['User', 'Movie', 'Rating']
+    """
+
     df = pd.read_csv(filename)
     df['User'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
     df['Movie'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
@@ -32,10 +44,13 @@ def load_csv(filename='data/data_train.csv'):
 
 
 def load_csv_kaggle():
+    """ Function to load the Kaggle CSV submission file sampleSubmission.csv """
     return load_csv('data/sampleSubmission.csv')
 
 
 def submission_table(original_df, col_userID, col_movie, col_rate):
+    """ return table according with Kaggle convention """
+
     def id(row):
         return 'r' + str(int(row[col_userID])) + '_c' + str(int(row[col_movie]))
 
@@ -50,15 +65,17 @@ def submission_table(original_df, col_userID, col_movie, col_rate):
 
 
 def extract_from_original_table(original_df):
+    """ extract User and Movie from kaggle's convention """
     df = pd.DataFrame.copy(original_df)
-    df['UserID'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
-    df['MovieID'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
+    df['User'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
+    df['Movie'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
     df['Rating'] = df['Prediction']
     df = df.drop(['Id', 'Prediction'], axis=1)
     return df
 
 
 def split(df, cut):
+    """ split table into train and test set """
     size = df.shape[0]
     keys = list(range(size))
     np.random.shuffle(keys)
@@ -74,6 +91,7 @@ def split(df, cut):
 
 
 def evaluate(prediction, test_set):
+    """ compute RMSE for pandas.DataFrame prediction table """
     test2 = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
 
     test2['square_error'] = np.square(test2['Rating'] - prediction['Rating'])
@@ -84,17 +102,17 @@ def evaluate(prediction, test_set):
     return rmse
 
 
-def signed_evaluate(prediction, test_set):
-    test2 = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
-
-    test2['error'] = (test2['Rating'] - prediction['Rating'])
-
-    mean_error = test2['error'].mean()
-
-    return mean_error
-
-
 def blender(models, weights):
+    """
+    Blend models according with different weights
+
+    Args:
+        models (dict): keys: model name; values: pandas.DataFrame predicitons
+        weights (dict): keys: model name; values: weights
+
+    Returns:
+        pandas.DataFrame: weighted blending
+    """
     if len(models) != len(weights):
         print("[WARNING] size(predictions) != size(weights)")
 
@@ -109,5 +127,7 @@ def blender(models, weights):
 
     return blend
 
+
 def unified_ordering(df):
+    """ Order pandas.DataFrame by ('Movie', 'User') and reset index """
     return df.sort_values(['Movie', 'User']).reset_index(drop=True)

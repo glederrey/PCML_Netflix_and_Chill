@@ -2,17 +2,21 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
 #
 # Distributed under terms of the MIT license.
 
 """
+run.py
 
+run command "spark-submit run.py" to launch it
+reproduce Kaggle's challenge predictions
 """
 
 # import models
-from models.means import *
 from models.medians import *
+from models.means import *
 from models.collaborative_filtering import *
 from models.MF_SGD import *
 from models.als import predictions_ALS
@@ -27,6 +31,7 @@ def main():
     print("============")
 
     print("[INFO] Start Spark")
+
     # configure and start spark
     conf = (SparkConf()
             .setMaster("local")
@@ -34,6 +39,10 @@ def main():
             .set("spark.executor.memory", "1g")
             )
     sc = SparkContext(conf=conf)
+
+    print("========================================")
+    print("[INFO] Start recommender system modeling")
+    print("========================================")
 
     # test if spark works
     if sc is not None:
@@ -46,13 +55,8 @@ def main():
     sc.setLogLevel("ERROR")
 
     print("[INFO] Load data set")
-
     train = load_csv('data/data_train.csv')
     test = load_csv('data/sampleSubmission.csv')
-
-    print("========================================")
-    print("[INFO] Start recommender system modeling")
-    print("========================================")
 
     # dictionary containing predictions
     models = {}
@@ -86,11 +90,11 @@ def main():
 
     print("[INFO] Modeling: Matrix Factorization using SGD")
     models['mf_sgd'] = matrix_factorization_SGD(train, test, gamma=0.004,
-                                           n_features=20, n_iter=20, init_method='global_mean')
+                                                n_features=20, n_iter=20, init_method='global_mean')
 
     print("[INFO] Modeling: ALS")
     models['als'] = predictions_ALS(train, test, spark_context=sc, rank=8,
-                               lambda_=0.081, iterations=24)
+                                    lambda_=0.081, iterations=24)
 
     weights = {'user_mean': -3.6773325300577424,
                'mf_sgd_rescale': -0.067287844047187018,

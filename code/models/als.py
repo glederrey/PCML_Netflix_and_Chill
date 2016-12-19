@@ -1,41 +1,56 @@
-import random
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
+#
+# Distributed under terms of the MIT license.
+
 from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
 
+''' 
+Matrix Factorization using Alternating Least Squares (ALS)
+It works with Spark RDD dataframes, but it accepts as input only Pandas dataframes and converts them to keep consistency between methods
+'''
 
-def predictions_ALS(train_set,test_set,spark_context, **arg):
-    ''' Function to return the predictions of an ALS model.
+def predictions_ALS(train_set, test_set, spark_context, **kwarg):
+    """
+    Function to return the predictions of an ALS model.
 
-    @ params:
-        - train_set, test_set, input PANDAS dataframe
-        - spark_context
-        - **arg, the parameters passed to ALS.train()
-    @ returns:
-        - prediction PANDAS dataframe. The column 'Rating' is the column with the sorted predictions
+    Args:
+        train_set (pandas.DataFrame): train set
+        test_set (pandas.DataFrame): test set
+        spark_context (spark.SparkContext): spark context
+        **kwarg: Arbitrary keyword arguments. Passed to ALS.train()
 
-    '''
+    Returns:
+        pandas.DataFrame: predictions, sorted by (Movie, User)
+    """
 
-    sqlContext=SQLContext(spark_context)
+    # Convert pd.DataFrame to Spark.rdd
+    sqlContext = SQLContext(spark_context)
 
-    train_sql=sqlContext.createDataFrame(train_set).rdd
-    test_sql=sqlContext.createDataFrame(test_set).rdd
-    
+    train_sql = sqlContext.createDataFrame(train_set).rdd
+    test_sql = sqlContext.createDataFrame(test_set).rdd
+
     # Train the model
-    model = ALS.train(train_sql, **arg)
-    
-    # Get the predictions
-    data_for_preditions=test_sql.map(lambda x: (x[0], x[1]))
-    predictions = model.predictAll(data_for_preditions).map(lambda r: ((r[0], r[1]), r[2]))
-    
-    # Convert to Pandas
-    pred_df = predictions.toDF().toPandas()
-    
-    # Post processing database
-    pred_df['User'] = pred_df['_1'].apply(lambda x: x['_1'])
-    pred_df['Movie'] = pred_df['_1'].apply(lambda x: x['_2'])
-    pred_df['Rating'] = pred_df['_2']
-    pred_df = pred_df.drop(['_1', '_2'], axis=1)
-    pred_df = pred_df.sort_values(by=['Movie', 'User'])
-    pred_df.index = range(len(pred_df))
-    return pred_df
+    model = ALS.train(train_sql, **kwarg)
 
+    # Get the predictions
+    data_for_predictions = test_sql.map(lambda x: (x[0], x[1]))
+    predictions = model.predictAll(data_for_predictions).map(lambda r: ((r[0], r[1]), r[2]))
+
+    # Convert Spark.rdd to pd.DataFrame
+    df = predictions.toDF().toPandas()
+
+    # Post processing database
+    df['User'] = df['_1'].apply(lambda x: x['_1'])
+    df['Movie'] = df['_1'].apply(lambda x: x['_2'])
+    df['Rating'] = df['_2']
+    df = df.drop(['_1', '_2'], axis=1)
+    df = df.sort_values(by=['Movie', 'User'])
+    df.index = range(len(df))
+
+    return df

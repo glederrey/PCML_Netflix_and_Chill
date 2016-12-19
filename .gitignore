@@ -2,6 +2,7 @@
 blender/metastore_db/*
 metastore_db/*
 blender/checkpoint/*
+code/checkpoint/*
 
 # intelliJ
 .idea/*
@@ -18,6 +19,7 @@ blender/checkpoint/*
 __pycache__/
 *.py[cod]
 *$py.class
+*__init__.py
 
 # C extensions
 *.so
