@@ -2,17 +2,21 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
 #
 # Distributed under terms of the MIT license.
 
 """
+run.py
 
+run command "spark-submit run.py" to launch it
+reproduce Kaggle's challenge predictions
 """
 
 # import models
-from models.means import *
 from models.medians import *
+from models.means import *
 from models.collaborative_filtering import *
 from models.MF_SGD import *
 from models.als import predictions_ALS
@@ -21,14 +25,12 @@ from helpers import load_csv, blender
 from pyspark import SparkContext, SparkConf
 
 
-
 def main():
     print("============")
     print("[INFO] START")
     print("============")
 
     print("[INFO] Start Spark")
-
 
     # configure and start spark
     conf = (SparkConf()
@@ -41,8 +43,6 @@ def main():
     print("========================================")
     print("[INFO] Start recommender system modeling")
     print("========================================")
-
-
 
     # test if spark works
     if sc is not None:

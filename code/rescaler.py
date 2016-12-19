@@ -2,39 +2,43 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
 #
 # Distributed under terms of the MIT license.
+
 """
 Allow a rescale of the data regarding the user mean, variation and deviation.
 
 BEST: deviation
 
-USE:
+USAGE:
     rescaler = Rescaler(df)
     rescaled_train_set = rescaler.normalize_deviation()
-    ...
-    ... do the ML training which return `predicted_set`...
-    ...
-    rescaled_test_set = rescaler.recover_deviation(predicted_set)
+
+        ( do the ML training which return `predicted_set` )
+
+    test_set = rescaler.recover_deviation(predicted_set)
+
 """
 
-import numpy as np
 import pandas as pd
 
 
 def dict_mean_user(df):
+    """ dictionary with key UserID and value User Mean """
     return dict(df.groupby('User').mean().Rating)
 
 
 def dict_var_user(df):
+    """ dictionary with key UserID and value User Variance """
     return dict(df.groupby('User').var().Rating)
 
 
 def dict_dev_user(df):
+    """ dictionary with key UserID and value User Deviation """
     global_mean = df.groupby('User').mean().Rating.mean()
     return dict(df.groupby('User').mean().Rating - global_mean)
-    np.mean(list(dict_mean.values()))
 
 
 class Rescaler:

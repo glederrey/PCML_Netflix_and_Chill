@@ -1,11 +1,30 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
+#
+# Distributed under terms of the MIT license.
+
 import pandas as pd
 import numpy as np
 
-import random
 from sklearn.linear_model import Ridge
 
 
-def collaborative_filtering(train, test, **arg):
+def collaborative_filtering(train, test, **kwarg):
+    """
+    Function to return the prediction of the collaborative filtering implementation
+
+    Args:
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+        **kwarg: Arbitrary keyword arguments.
+
+    Returns:
+        pandas.DataFrame: predictions, sorted by (Movie, User)
+    """
     # Rating of the train set
     rating = train.pivot(index='User', columns='Movie').Rating
 
@@ -13,7 +32,7 @@ def collaborative_filtering(train, test, **arg):
     Nu, Nm = len(users), len(movies)
 
     # Number of movie features
-    nbr_movie_features = arg['movie_features']
+    nbr_movie_features = kwarg['movie_features']
 
     # Matrix of user preferences
     U = pd.DataFrame(np.random.rand(Nu, nbr_movie_features), index=users, columns=range(1, nbr_movie_features + 1))
@@ -23,7 +42,7 @@ def collaborative_filtering(train, test, **arg):
 
     U0, M0 = U.copy(), M.copy()
 
-    alpha = arg['alpha']
+    alpha = kwarg['alpha']
 
     bestFit = {'U': U0, 'M': M0, 'error': np.inf}
     fitUM(bestFit, alpha, U0, M0, train, rating, users, movies)

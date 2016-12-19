@@ -2,29 +2,34 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
 #
 # Distributed under terms of the MIT license.
 """
-Mean prediction method, assigning movie/user/global mean to all items
+Mean prediction method, assigning movie/user/global mean to items.
+
+Functions have the following signature:
+    Args:
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+
+    Returns:
+        pandas.DataFrame: predictions, sorted by (Movie, User)
 """
 
-import numpy as np
 from helpers import *
 import pandas as pd
 
 
 def user_mean(train, test):
-    ''' Function to assign the user mean to each non labelled element in the test
-    
-    @ params
-        - train, pandas dataframe with columns User, Movie, Rating
-        - test, pandas dataframe with columns User, Movie
-    @ returns
-        - predictions, pandas dataframe with columns User, Movie, Rating
-    '''
+    """ user mean """
+
+    # prepare
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x))
+
+    # pd.DataFrame ['User', 'Mean']
     means = train.groupby('User').mean()['Rating']
 
     def line(df):
@@ -33,7 +38,7 @@ def user_mean(train, test):
 
     predictions = predictions.groupby('User').apply(line)
 
-    # integer for id
+    # convert ID's to integers
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
@@ -41,17 +46,13 @@ def user_mean(train, test):
 
 
 def movie_mean(train, test):
-    ''' Function to assign the item mean to each non labelled element in the test
-    
-    @ params
-        - train, pandas dataframe with columns User, Movie, Rating
-        - test, pandas dataframe with columns User, Movie
-    @ returns
-        - predictions, pandas dataframe with columns User, Movie, Rating
-    '''
+    """ movie mean """
 
+    # prepare
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x))
+
+    # pd.DataFrame ['Movie', 'Mean']
     means = train.groupby('Movie').mean()['Rating']
 
     def line(df):
@@ -60,7 +61,7 @@ def movie_mean(train, test):
 
     predictions = predictions.groupby('Movie').apply(line)
 
-    # integer for id
+    # convert ID's to integers
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
@@ -68,23 +69,19 @@ def movie_mean(train, test):
 
 
 def global_mean(train, test):
-    ''' Function to assign the global mean to each non labelled element in the test
-    
-    @ params
-        - train, pandas dataframe with columns User, Movie, Rating
-        - test, pandas dataframe with columns User, Movie
-    @ returns
-        - predictions, pandas dataframe with columns User, Movie, Rating
-    '''
+    """ overall mean """
 
+    # prepare
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x))
 
+    # global mean
     mean = train['Rating'].mean()
 
+    # apply
     predictions.Rating = mean
 
-    # integer for id
+    # convert ID's to integer
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
@@ -92,17 +89,16 @@ def global_mean(train, test):
 
 
 def movie_mean_deviation_user(train, test):
-    ''' Function to assign to each non labelled element in the test the item mean with a deviation term for each user
-    
-    @ params
-        - train, pandas dataframe with columns User, Movie, Rating
-        - test, pandas dataframe with columns User, Movie
-    @ returns
-        - predictions, pandas dataframe with columns User, Movie, Rating
-    '''
+    """ movie mean rescaled with the 'deviation_per_user' file """
+
+    # prepare
     predictions = pd.DataFrame.copy(test)
     predictions.Rating = predictions.Rating.apply(lambda x: float(x))
+
+    # pd.DataFrame ['Movie', 'Mean']
     means = train.groupby('Movie').mean()['Rating']
+
+    # load file 'deviation_per_user.csv'
     deviation = pd.read_csv('data/deviations_per_users.csv')
 
     def line(df):
@@ -111,6 +107,7 @@ def movie_mean_deviation_user(train, test):
 
     predictions = predictions.apply(line, axis=1)
 
+    # convert ID's to integer
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 

@@ -6,26 +6,38 @@
 #
 # Distributed under terms of the MIT license.
 """
-median prediction method, assigning movie/user/global median to all items
+Median prediction method, assigning movie/user/global mean to items.
+
+Functions have the following signature:
+    Args:
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+
+    Returns:
+        pandas.DataFrame: predictions, sorted by (Movie, User)
 """
 
-import numpy as np
 from helpers import *
 import pandas as pd
 
+
 def user_median(train, test):
+    """ user median """
+
+    # prepare
     predictions = pd.DataFrame.copy(test)
-    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
-    medians = train.groupby('User').median()['Rating']
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x))
+
+    # pd.DataFrame ['User', 'Median']
+    means = train.groupby('User').median()['Rating']
 
     def line(df):
-        df['Rating'] = medians.loc[df['User'].iloc[0]]
-        return df#[['User', 'Movie', 'Rating']]
+        df['Rating'] = means.loc[df['User'].iloc[0]]
+        return df
 
     predictions = predictions.groupby('User').apply(line)
-    #predictions = predictions.apply(line, axis=1)
 
-    # integer for id
+    # convert ID's to integers
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
@@ -33,19 +45,22 @@ def user_median(train, test):
 
 
 def movie_median(train, test):
+    """ movie median """
 
+    # prepare
     predictions = pd.DataFrame.copy(test)
-    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
-    medians = train.groupby('Movie').median()['Rating']
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x))
+
+    # pd.DataFrame ['Movie', 'Median']
+    means = train.groupby('Movie').median()['Rating']
 
     def line(df):
-        df['Rating'] = medians.loc[df['Movie'].iloc[0]]
-        return df#[['User', 'Movie', 'Rating']]
+        df['Rating'] = means.loc[df['Movie'].iloc[0]]
+        return df
 
     predictions = predictions.groupby('Movie').apply(line)
-    #predictions = predictions.apply(line, axis=1)
 
-    # integer for id
+    # convert ID's to integers
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
@@ -53,45 +68,45 @@ def movie_median(train, test):
 
 
 def global_median(train, test):
-
+    """ global median """
+    # prepare
     predictions = pd.DataFrame.copy(test)
-    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x))
 
-    median = train['Rating'].median()
-       
-    #def line(df):
-    #    df['Rating'] = median
-    #    return df[['User', 'Movie', 'Rating']]
+    # global median
+    mean = train['Rating'].median()
 
-    #predictions = predictions.apply(line, axis=1)
-    
-    predictions.Rating=median
-    
-    # integer for id
+    # apply
+    predictions.Rating = mean
+
+    # convert ID's to integer
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
     return predictions
-    
+
+
 def movie_median_deviation_user(train, test):
+    """ movie median rescaled with the 'deviation_per_user' file """
 
+    # prepare
     predictions = pd.DataFrame.copy(test)
-    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
-    medians = train.groupby('Movie').median()['Rating']
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x))
+
+    # pd.DataFrame ['Movie', 'Median']
+    means = train.groupby('Movie').median()['Rating']
+
+    # load file 'deviation_per_user.csv'
     deviation = pd.read_csv('data/deviations_per_users.csv')
-    
+
     def line(df):
-        df['Rating'] = medians.loc[int(df['Movie'])] + deviation.loc[int(df['User']-1)].dev 
-        return df#[['User', 'Movie', 'Rating']]
-        
+        df['Rating'] = means.loc[int(df['Movie'])] + deviation.loc[int(df['User']) - 1].dev
+        return df
+
     predictions = predictions.apply(line, axis=1)
-    
-    #predictions['Rating'] = np.where(predictions['Rating'] > 5, predictions['Rating'], 5)
-    #predictions['Rating'] = np.where(predictions['Rating'] < 1, predictions['Rating'], 1)
-    
+
+    # convert ID's to integer
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)
 
     return predictions
-
-    
