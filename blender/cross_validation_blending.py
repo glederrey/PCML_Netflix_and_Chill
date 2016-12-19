@@ -3,6 +3,7 @@ import numpy as np
 from cross_validation import KFoldIndexes
 import itertools
 import os
+import pickle
 
 class CrossValidationBlending:
     ''' Class to cross validate a blended model. The different submodels should have a predefined set of parameters.
@@ -108,7 +109,7 @@ class CrossValidationBlending:
                 test=self.tests_list[test_index]
                 
                 self.real_values.append(test.Rating)
-                self.predictions[model_name].append(function(train,test,**arguments))
+                self.predictions[model_name].append(function(train,test,**arguments))                
                 os.system('rm metastore_db/*.lck')
             
     def evaluate_blending(self,blending_dict):        

@@ -12,6 +12,24 @@ Mean prediction method, assigning movie/user/global mean to all items
 import numpy as np
 from helpers import *
 import pandas as pd
+from rescaler import Rescaler
+
+def global_mean(train, test):
+    print("[GLOBAL_MEAN] applying")
+
+    predictions = pd.DataFrame.copy(test)
+    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
+
+    mean = train['Rating'].mean()
+    
+    predictions.Rating=mean
+    
+    # integer for id
+    predictions['User'] = predictions['User'].astype(int)
+    predictions['Movie'] = predictions['Movie'].astype(int)
+
+    print("[GLOBAL_MEAN] done")
+    return predictions
 
 def user_mean(train, test):
     print("[USER_MEAN] applying")
@@ -32,7 +50,14 @@ def user_mean(train, test):
 
     print("[USER_MEAN] done")
     return predictions
+    
+def movie_mean_rescaling(df_train, df_test):
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
 
+    prediction_normalized = movie_mean(df_train_normalized, df_test)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
 
 def movie_mean(train, test):
     print("[MOVIE_MEAN] applying")
@@ -54,30 +79,14 @@ def movie_mean(train, test):
 
     print("[MOVIE_MEAN] done")
     return predictions
-
-
-def global_mean(train, test):
-    print("[GLOBAL_MEAN] applying")
-
-    predictions = pd.DataFrame.copy(test)
-    predictions.Rating = predictions.Rating.apply(lambda x: float(x)) 
-
-    mean = train['Rating'].mean()
-       
-    #def line(df):
-    #    df['Rating'] = mean
-    #    return df[['User', 'Movie', 'Rating']]
-
-    #predictions = predictions.apply(line, axis=1)
     
-    predictions.Rating=mean
-    
-    # integer for id
-    predictions['User'] = predictions['User'].astype(int)
-    predictions['Movie'] = predictions['Movie'].astype(int)
+def movie_mean_deviation_user_rescaling(df_train, df_test):
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
 
-    print("[GLOBAL_MEAN] done")
-    return predictions
+    prediction_normalized = movie_mean_deviation_user(df_train_normalized, df_test)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
     
 def movie_mean_deviation_user(train, test):
     print("[MOVIE_MEAN_DEVIATION_USER] applying")
@@ -88,14 +97,10 @@ def movie_mean_deviation_user(train, test):
     deviation = pd.read_csv('../data/deviations_per_users.csv')
     
     def line(df):
-    
-        df['Rating'] = means.loc[int(df['Movie'])] + deviation.loc[int(df['User'])-1].dev 
-        return df#[['User', 'Movie', 'Rating']]
+        df['Rating'] = means.loc[int(df['Movie'])] + deviation.loc[int(df['User'])-1].dev
+        return df
         
     predictions = predictions.apply(line, axis=1)
-    
-    #predictions['Rating'] = np.where(predictions['Rating'] > 5, predictions['Rating'], 5)
-    #predictions['Rating'] = np.where(predictions['Rating'] < 1, predictions['Rating'], 1)
     
     predictions['User'] = predictions['User'].astype(int)
     predictions['Movie'] = predictions['Movie'].astype(int)

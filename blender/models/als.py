@@ -1,6 +1,30 @@
 import random
 from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
+from rescaler import Rescaler
+
+def predictions_ALS_rescaling(df_train, df_test, spark_context, **kwargs):
+    """
+    ALS with pyspark
+    First do a rescaling of the user in a way that they all have the same mean of rating.
+    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
+    appreciation of a movie.
+
+    :param df_train:
+    :param df_test:
+    :param kwargs:
+        gamma (float): regularization parameter
+        n_features (int): number of features for matrices
+        n_iter (int): number of iterations
+        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
+    :return:
+    """
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
+
+    prediction_normalized = predictions_ALS(df_train_normalized, df_test, spark_context, **kwargs)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
 
 
 def predictions_ALS(train_set,test_set,spark_context, **arg):
