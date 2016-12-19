@@ -3,6 +3,31 @@ import numpy as np
 
 import random
 from sklearn.linear_model import Ridge
+from rescaler import Rescaler
+
+
+def collaborative_filtering_rescaling(df_train, df_test, **kwargs):
+    """
+    Collaborative Filtering
+    First do a rescaling of the user in a way that they all have the same mean of rating.
+    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
+    appreciation of a movie.
+
+    :param df_train:
+    :param df_test:
+    :param kwargs:
+        gamma (float): regularization parameter
+        n_features (int): number of features for matrices
+        n_iter (int): number of iterations
+        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
+    :return:
+    """
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
+
+    prediction_normalized = collaborative_filtering(df_train_normalized, df_test, **kwargs)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
 
 def collaborative_filtering(train, test, **arg):
     print('[COLLABORATIVE FILTERING] applying')
