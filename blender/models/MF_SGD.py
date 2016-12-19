@@ -19,7 +19,6 @@ from models.helpers import *
 from models.means import *
 from rescaler import Rescaler
 
-
 def matrix_factorization_SGD_rescaling(df_train, df_test, **kwargs):
     """
     Matrix factorization using SGD.
