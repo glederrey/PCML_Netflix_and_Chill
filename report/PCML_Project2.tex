@@ -238,8 +238,11 @@ The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Priz
 %========================
 \section{Result}
 
-In order to create our recommender algorithm, 2 steps are required. The first step is to find the best parameters for each models. Therefore, a cross validation process was used on the models MF-SGD, ALS, Collab. Filtering and PyFM. Once the best parameters are found, the blending is applied between all the models with another cross validation process. 
-
+In order to create our recommender algorithm, 2 steps are required. 
+\begin{enumerate}
+\item Find the best parameters for each models. A cross validation process was performed on the models MF-SGD, ALS, Collab. Filtering and PyFM. %The first step is to find the best parameters for each models. Therefore, a cross validation process was used on the models MF-SGD, ALS, Collab. Filtering and PyFM. 
+\item Apply the blending between all the models with another cross validation process.%Once the best parameters are found, the blending is applied between all the models with another cross validation process. 
+\end{enumerate}
 In this section, we first present the blending of the models as well as their parameters found after cross validation. Then, we present the benchmarks of the models and the blending.
 
 \subsection{Blending}
@@ -310,18 +313,37 @@ blending			& 0.96191 \\
   \label{benchmark}
 \end{table}
 
-The models were not tested individually on the Kaggle Public dataset. But the blending gives a result of \textcolor{red}{0.97788}. 
+The models were not tested individually on the Kaggle Public dataset. The blending gives a result of \textcolor{red}{0.97788}. 
 
 %========================
-\section{Discussion}
+\section{Discussion of the results}
 
-We can first discuss about the models. The models we used are quite simple. Therefore, using more complex algorithms instead of these would help a bit more. However with our blending method, we can use as many algorithms as we want. Indeed, since we're using an optimization algorithm, the optimization can decide itself if it should discard a model or not. However there's some risk to overfit the data. And it is happening a little bit. Indeed, the RMSE on the validations sets is a bit smaller than the RMSE on Kaggle. 
+Excluding the trivial models based on the users/movies means/medians, we mainly focused on Matrix
+Factorization algorithms, exploiting different techniques to achieve the best factorization
+possible. Content-based filtering algorithms are not suited for this problem since the users and the
+movies are fully anonymized and without additional informations.
+
+The blending plays an important role in our project. For the large number of studied models,
+finding a good blend between them proved to be a complex task. The solution that we present pushes
+as much as possible the RMSE, while at the same time introducing a noticeable overfitting of the
+data.
+
+In this Section we will discuss about these aspects.
+
+%We can first discuss about the models. The models we used are quite simple. Therefore, using more
+%complex algorithms instead of these would help in achieving better results. However with our blending method, we can use as many algorithms as we want. Indeed, since we're using an optimization algorithm, the optimization can decide itself if it should discard a model or not. However there's some risk to overfit the data. And it is happening a little bit. Indeed, the RMSE on the validations sets is a bit smaller than the RMSE on Kaggle. 
+
+\subsubsection{Choice of the models}
 
 \subsubsection{Why keeping model with and without normalization?}
 
 It should be legitimate to ask why are we keeping both normalized and unnormalized model for
 median/mean. Looking at the coefficients give a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized model. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
 
+\subsubsection{Blending choices}
+
+
+\subsubsection{Overfitting}
 
 
 
