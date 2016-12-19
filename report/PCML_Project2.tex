@@ -47,7 +47,16 @@
 
 %========================
 \begin{abstract}
-Collaborative Filtering Recommender Systems for movies collection blending 12 different methods (8 direct scoring method and 4 iterative ones) in order to achieve around 0.977 RMSE on Kaggle's EPFL ML Recommender System challenge. 
+Recommender systems are one of the more dynamic fields in the machine learning world. Almost all
+internet companies have to keep track and to analyze the user preferences and the interest about the
+more recent and advanced algorithm is spreading fast.
+In this paper we analyse  different approaches to this problem using a standard movie recommendation
+dataset with only the user ratings informations and the RMSE metric.
+According to several studies \cite{BellKore_netflix} \cite{schafer2002meta} the best results are
+obtained through a clever blend of several models.
+Exploiting this approach we blended 12 different methods (8 direct scoring method and 4 iterative
+ones) eventually achieving around 0.977 RMSE on the Kaggle's EPFL ML Recommender System challenge. 
+%Collaborative Filtering Recommender Systems for movies collection blending 12 different methods (8 direct scoring method and 4 iterative ones) in order to achieve around 0.977 RMSE on Kaggle's EPFL ML Recommender System challenge. 
 \end{abstract}
 
 %========================
@@ -173,6 +182,7 @@ element of the summation, randomly chosen. The update process then follows the s
 gradient descent.
 An almost certain convergence to a local minimum is guaranteed under not restrictive hypothesis.
 
+Using the \texttt{scipy.sparse} matrices library, we implemented the SGD method from scratch.
 Through a cross validation process we chosed the best values for the paramester $K$, $\lambda$ and
 the number of iterations. The results that we obtained will be presented in Section
 \ref{sec:model_bench}.
@@ -184,20 +194,27 @@ while optimizing the problem \ref{eq:functional} with respect to the other matri
 The optimization problem at each iteration is much easier to solve compared to the one solved by the
 SGD. A simple least squares technique can be exploited.
 
-For speed reasons we decided to use the open source framework Apache Spark to implement this method.
-Spark allows to specify the parameters $K$, the number of iterations and $\lambda$. We perform a
+%For speed reasons we decided to use the open source framework Apache Spark to implement this method.
+One of the most advanced open source frameworks available to solve this problem is Apache Spark. It
+is a cluster computing framework that provides to the programmers an application programming
+interface to efficiently execute streaming, machine learning or SQL workloads that require fast
+iterative access to datasets.
+The Spark package \texttt{mllib} contains several implementations of different machine learning
+algorithms, including the ALS for collaborative filtering. Therefore we decided to exploit this
+library for the implementation.
+Spark also allows to specify the parameters $K$, the number of iterations and $\lambda$. We perform a
 cross validation to choose the best parameters, whose results will be discussed in Section 
 \ref{sec:model_bench}.
 
 \subsection{PyFM}
 
-We implemented two version of the SGD methods:
-\begin{itemize}
-\item An implementation from scratch, using \texttt{scipy.sparse} matrices library.
-\item An implementation based on the PyFM Python library, a wrapper of the C++ library libFM
-\cite{rendle:tist2012}, one of
-the most advanced matrix factorization libraries.
-\end{itemize}
+%We implemented two version of the SGD methods:
+%\begin{itemize}
+%\item An implementation from scratch, using \texttt{scipy.sparse} matrices library.
+%\item An implementation based on the PyFM Python library, a wrapper of the C++ library libFM
+%\cite{rendle:tist2012}, one of
+%the most advanced matrix factorization libraries.
+%\end{itemize}
 
 PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012}, one of the more advanced matrix factorization libraries. It can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD \ref{sec:mf-sgd}. 
 
@@ -302,7 +319,8 @@ We can first discuss about the models. The models we used are quite simple. Ther
 
 \subsubsection{Why keeping model with and without normalization?}
 
-It should be legitimate to ask why are we keeping both normalized and unnormalized model for median/mean. Looking at the coefficient give a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized model. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
+It should be legitimate to ask why are we keeping both normalized and unnormalized model for
+median/mean. Looking at the coefficients give a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized model. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
 
 
 
