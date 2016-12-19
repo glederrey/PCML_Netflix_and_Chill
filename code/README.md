@@ -46,6 +46,9 @@ The predictions will be written in a file `predictions.py`
     - *means.py*
     - *median.py*
     - *MF_SGD.py*
+- *cross_validation* : classes used to test models and select their parameters
+    - *cross_validation.py* 
+    - *cross_validation_blender.py*
 - *rescaler.py* : is a normalizer class called by the models
 - *run.py* : run whole project and reproduce Kaggle's challenge predictions 
 
@@ -71,4 +74,4 @@ Caused by: org.apache.spark.SparkException: File .../run.py exists and does not 
 
 Spark encounters some error while trying to reuse file previously stored in its own cache.
 In order to avoid this clear the folders `./__pycache__` and `./models/__pycache__`if you want to 
-run the project twice. (Or run the provided shell script `clean_cache.sh`)
+run the project twice. (Or run the provided shell script `clean_pycache.sh`)
