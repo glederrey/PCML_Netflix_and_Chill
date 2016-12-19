@@ -10,6 +10,10 @@
 from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
 
+''' 
+Matrix Factorization using Alternating Least Squares (ALS)
+It works with Spark RDD dataframes, but it accepts as input only Pandas dataframes and converts them to keep consistency between methods
+'''
 
 def predictions_ALS(train_set, test_set, spark_context, **kwarg):
     """

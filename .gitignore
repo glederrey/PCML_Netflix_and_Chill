@@ -2,6 +2,7 @@
 blender/metastore_db/*
 metastore_db/*
 blender/checkpoint/*
+code/checkpoint/*
 
 # intelliJ
 .idea/*

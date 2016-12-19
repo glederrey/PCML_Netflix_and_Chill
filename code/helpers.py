@@ -44,7 +44,7 @@ def load_csv(filename='data/data_train.csv'):
 
 
 def load_csv_kaggle():
-    """ load kaggle's test set """
+    """ Function to load the Kaggle CSV submission file sampleSubmission.csv """
     return load_csv('data/sampleSubmission.csv')
 
 
@@ -67,8 +67,8 @@ def submission_table(original_df, col_userID, col_movie, col_rate):
 def extract_from_original_table(original_df):
     """ extract User and Movie from kaggle's convention """
     df = pd.DataFrame.copy(original_df)
-    df['UserID'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
-    df['MovieID'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
+    df['User'] = df['Id'].apply(lambda x: int(x.split('_')[0][1:]))
+    df['Movie'] = df['Id'].apply(lambda x: int(x.split('_')[1][1:]))
     df['Rating'] = df['Prediction']
     df = df.drop(['Id', 'Prediction'], axis=1)
     return df
