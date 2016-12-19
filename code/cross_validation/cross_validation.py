@@ -1,26 +1,46 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim:fenc=utf-8
+#
+# Copyright © 2016 Joachim Muth <joachim.henri.muth@gmail.com>, Gael Lederrey <gael.lederrey@epfl.ch>,
+# Stefano Savare <stefano.savare@epfl.ch>
+#
+# Distributed under terms of the MIT license.
+
 import random
 from pyspark.sql import SQLContext
 import itertools
 
 
+def get_tests_database(data, k_fold_indexes):
+    """Internal function to get the list of test pandas dataframe"""
+    tests = []
+    for i in k_fold_indexes.indexes:
+        tests.append(data.loc[i[1]])
+    return tests
+
+
 class KFoldIndexes:
-    ''' Class to get indexes for cross validation
-    
-    Usage: 
+    """ Class to get indexes for cross validation
+
+    Usage:
     indexes=KFoldIndexes(4,10)
     indexes.indexes  # to access the indexes of the cross validation, it is a list of tuples (train,test)
-    
-    @ variables
-        - indexes, a list of tuples (train,test), access to this variable to get the splits
-          train-test. train and test are 2 list of the indexes of the elements of the train and of the test.
-    '''
+
+    Attributes:
+        indexes (list):  a list of tuples (train,test), access to this variable to get the splits
+                        train-test. train and test are 2 list of the indexes of
+                        the elements of the train and of the test.
+    """
 
     def __init__(self, n_splits, rows):
-        ''' Method to initialize the class
-        @ params
-            - n_splits, the number of folds in the cross validation
-            - rows, the rows in the database to split
-        '''
+        """ Method to initialize the class
+
+        Args:
+            n_splits (int): the number of folds in the cross validation
+            rows: the rows in the database to split
+        """
+
         test_elements = int(rows / n_splits)  # How many elements in the tests partitions
         remaining_elements = rows % n_splits  # If rows is not divisible by n_splits, some elements have to be reallocated
         elements_remaining_list = list(
@@ -48,35 +68,37 @@ class KFoldIndexes:
 
 
 class CrossValidation:
-    ''' Class to run the cross validation with different models
-    
+    """ Class to run the cross validation with different models
+
     Usage:
     cross_val=CrossValidation(data,k,use_spark)
     cross_val.evaluate(model)
-    
+
     The model passed as input parameter should have the following interface:
     def fit(train,**arg) -> void function
     def predict(test)    -> void function
     def evaluate(test)   -> return the rmse with the parameter passed in fit()
-    
+
     The split is ALWAYS done by rows
-    
-    Variables:
-    self.k
-    self.use_spark   -> if True the train and test database are rdd dataframe. If False they are pd dataframe
-    self.tests_list  -> list of all the test dataframe used. When a test database is used, the train is computed as the union of the union of the other tests in this list. 
-    self.sc          -> spark context
-    '''
+
+    Attributes:
+        k
+        use_spark (bool): if True the train and test database are rdd dataframe. If False they are pd dataframe
+        tests_list (list): list of all the test dataframe used.
+                            When a test database is used, the train is computed as the union of
+                            the union of the other tests in this list.
+        sc (Spark.SparkContext)
+    """
 
     def __init__(self, data, k, use_spark, spark_context):
-        ''' Initialization function. It creates self.tests_list, the list of all the test dataframe
-        
-        @ params
-            - data, the input dataframe
-            - k, the number of splits in the cross validation
-            - use_spark, if using rdd dataframe or pd dataframe
-            - spark_context, typically sc
-        '''
+        """ Initialization function. It creates self.tests_list, the list of all the test dataframe
+
+        Args:
+           data (pandas.DataFrame): the input dataframe
+           k (int):  the number of splits in the cross validation
+           use_spark (bool): if using rdd dataframe or pd dataframe
+           spark_context (Spark.SparkContext)
+        """
 
         # Initialize the parameters
         self.k = k
@@ -87,21 +109,22 @@ class CrossValidation:
         k_fold_indexes = KFoldIndexes(k, data.shape[0])
 
         if use_spark:
-            self.tests_list = self.get_sql_from_pd(self.get_tests_database(data, k_fold_indexes))
+            self.tests_list = self.get_sql_from_pd(get_tests_database(data, k_fold_indexes))
         else:
-            self.tests_list = self.get_tests_database(data, k_fold_indexes)
+            self.tests_list = get_tests_database(data, k_fold_indexes)
 
-    def evaluate(self, model, **arg):
-        ''' Function that evaluates a model passed as input with some arguments and returns a list
-of rmse errors
-        
-        @ params
-            - model. See class description for the requirements of this model
-            - a set of params **arg that will be passed to the fit function of the model.
-        
-        @ returns
-            - a list of rmse error. One for each split in the cross validation
-        '''
+    def evaluate(self, model, **kwarg):
+        """ Function that evaluates a model passed as input with some arguments and returns a list
+            of rmse errors
+
+        Args:
+            model: See class description for the requirements of this model
+            **kwarg: Arbitrary keyword arguments.
+
+        Returns:
+            list: a list of rmse error. One for each split in the cross validation
+        """
+
         error_list = []
         for comb in itertools.combinations(range(self.k), self.k - 1):
             trains = [self.tests_list[x] for x in comb]
@@ -112,21 +135,14 @@ of rmse errors
             test_index = [x for x in range(self.k) if x not in comb][0]
             test = self.tests_list[test_index]
 
-            model.fit(train, **arg)
+            model.fit(train, **kwarg)
             model.predict(test)
             error = model.evaluate(test)
             error_list.append(error)
         return error_list
 
-    def get_tests_database(self, data, k_fold_indexes):
-        '''Internal function to get the list of test pandas dataframe'''
-        tests = []
-        for i in k_fold_indexes.indexes:
-            tests.append(data.loc[i[1]])
-        return tests
-
     def get_sql_from_pd(self, df_list):
-        '''Internal function to convert the list of pandas dataframe to a list of rdd dataframe'''
+        """Internal function to convert the list of pandas dataframe to a list of rdd dataframe"""
         sqlContext = SQLContext(self.sc)
         sql_list = []
         for i in df_list:
