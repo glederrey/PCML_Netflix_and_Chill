@@ -18,6 +18,7 @@ blender/checkpoint/*
 __pycache__/
 *.py[cod]
 *$py.class
+*__init__.py
 
 # C extensions
 *.so
@@ -115,4 +116,14 @@ notebooks/metastore_db/*
 *.pickle
 */*.pickle
 */*/*.pickle
+
+# Remove stuff with report
+report/*.log
+report/*.out
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.tex.backup
+report/*.tex.swp
+
 
