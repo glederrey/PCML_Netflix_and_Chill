@@ -92,11 +92,12 @@ def split(df, cut):
 
 def evaluate(prediction, test_set):
     """ compute RMSE for pandas.DataFrame prediction table """
-    test2 = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
+    test_sorted = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
+    prediction_sorted = prediction.sort_values(['Movie', 'User']).reset_index(drop=True)
 
-    test2['square_error'] = np.square(test2['Rating'] - prediction['Rating'])
+    test_sorted['square_error'] = np.square(test_sorted['Rating'] - prediction_sorted['Rating'])
 
-    mse = test2['square_error'].mean()
+    mse = test_sorted['square_error'].mean()
     rmse = np.sqrt(mse)
 
     return rmse

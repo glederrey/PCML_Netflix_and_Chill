@@ -21,7 +21,7 @@
 \usepackage{amssymb}
 
 % url
-\usepackage{hyperref}
+\usepackage{url}
 
 %subfigure
 \usepackage{subcaption}
@@ -30,6 +30,9 @@
 % multiline tabular cell
 \newcommand{\specialcell}[2][c]{%
   \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+  
+% nice fraction
+\usepackage{units}
 
 
 
@@ -232,9 +235,13 @@ The number of iterations was fixed. The two other parameters were chosen with th
 
 This algorithm is nothing more than another implementation \textcolor{red}{An other implementation of what?}
 
+%========================
 \section{Blending}
 
-The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred of different models. \cite{BellKore_netflix} Without having the same amout of models, we proceed the same to obtain our final solution. We performe a weighted sum that we optimize using \textbf{Nelder-Mead} method provided by \texttt{scipy.optimize} library. Initial weights are set to $0.1$ for each model.
+The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred of different models. \cite{BellKore_netflix} Without having the same amout of models, we proceed the same to obtain our final solution. We performe a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). 
+
+\subsection{SLSQP method}
+Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. It differs from Newton method by computing the Hessian matrix but by estimating it by successive gradient vector analyze \cite{wiki:quasi_newton}. It's
 
 %========================
 \section{Result}

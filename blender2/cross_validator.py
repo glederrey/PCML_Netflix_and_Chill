@@ -39,6 +39,7 @@ class CrossValidator:
         """
         self.indices_dictionary = None
         self.predictions_dictionary = {}
+        self.ground_truth_dictionary = None
 
     """"""""""""""""""""""""""""""""""""
 
@@ -47,7 +48,7 @@ class CrossValidator:
     """"""""""""""""""""""""""""""""""""
 
 
-    def shuffle_indices(self, df, k):
+    def define_indices(self, df, k):
         """ take a pandas.DataFrame and calculate k array of shuffled indices for cross-validation"""
 
         n = df.shape[0]
@@ -74,13 +75,6 @@ class CrossValidator:
         self.indices_dictionary = fold_dictionary
         return fold_dictionary
 
-    def shuffle_indices_and_store(self, df, k):
-        """ create indices_dictionary AND store it in file """
-        dic = self.shuffle_indices(df, k)
-        self.store_indices()
-
-        return dic
-
     def k_fold_predictions(self, df, model, model_name, **kwargs):
         """
         add a model to the predictions dictionary containing k pandas.DataFrame for each model
@@ -102,7 +96,7 @@ class CrossValidator:
         predictions_dict = {}
         for i in range(len(self.indices_dictionary)):
             train = df.loc[self.indices_dictionary[i]['train']].sort_index()
-            test = df.loc[self.indices_dictionary[i]['train']].sort_index()
+            test = df.loc[self.indices_dictionary[i]['test']].sort_index()
 
             predictions = model(train, test, **kwargs)
             predictions_dict[i] = predictions
@@ -112,18 +106,8 @@ class CrossValidator:
 
         return predictions_dict
 
-    def k_fold_predictions_and_store(self, df, model, model_name, **kwargs):
-        """ produce k-fold predictions AND store the prediction in files """
+    def define_ground_truth(self, df):
 
-        # check folder or create
-        folder_name = './CV/' + model_name
-        create_folder(folder_name)
-
-        pred_dict = self.k_fold_predictions(df, model, model_name, **kwargs)
-
-        for i in pred_dict.keys():
-            file_name = folder_name + '/' + str(i) + '.csv'
-            pred_dict[i].to_csv(file_name, index=False)
 
     def evaluate_model(self, model_name, test_df):
         """ cross validation """
@@ -145,7 +129,20 @@ class CrossValidator:
 
     """"""""""""""""""""""""""""""""""""
 
-    def store_prediction(self):
+    def k_fold_predictions_and_store(self, df, model, model_name, **kwargs):
+        """ produce k-fold predictions AND store the prediction in files """
+
+        # check folder or create
+        folder_name = './CV/' + model_name
+        create_folder(folder_name)
+
+        pred_dict = self.k_fold_predictions(df, model, model_name, **kwargs)
+
+        for i in pred_dict.keys():
+            file_name = folder_name + '/' + str(i) + '.csv'
+            pred_dict[i].to_csv(file_name, index=False)
+
+    def store_predictions(self):
         """ dump predictions_dictionary in file """
         for model_name in self.predictions_dictionary.keys():
             folder_name = './CV/' + model_name
@@ -155,22 +152,7 @@ class CrossValidator:
                 file_name = folder_name + '/' + str(j) + '.csv'
                 self.predictions_dictionary[model_name][j].to_csv(file_name, index=False)
 
-    def store_indices(self):
-        """ dump indices_dictionary in file """
-        folder_name = './CV/' + 'indices'
-        create_folder(folder_name)
-
-        for i in self.indices_dictionary.keys():
-            file_name = folder_name + '/' + str(i)
-            with open(file_name + '_train.csv', 'w') as file:
-                for item in self.indices_dictionary[i]['train']:
-                    file.write("%s\n" % item)
-
-            with open(file_name + '_test.csv', 'w') as file:
-                for item in self.indices_dictionary[i]['test']:
-                    file.write("%s\n" % item)
-
-    def load_model(self, model_names):
+    def load_predictions(self, model_names):
         """ load models from list of name and add it (replace if already existing) to predictions_dictionary """
         list_files = os.listdir('./CV/')
         for model_name in model_names:
@@ -186,6 +168,32 @@ class CrossValidator:
             self.predictions_dictionary[model_name] = pred_dict
 
         return self.predictions_dictionary
+
+    def clean_predictions(self):
+        """ clear all predictions """
+        self.predictions_dictionary = {}
+
+    def define_indices_and_store(self, df, k):
+        """ create indices_dictionary AND store it in file """
+        dic = self.define_indices(df, k)
+        self.store_indices()
+
+        return dic
+
+    def store_indices(self):
+        """ dump indices_dictionary in file """
+        folder_name = './CV/' + 'indices'
+        create_folder(folder_name)
+
+        for i in self.indices_dictionary.keys():
+            file_name = folder_name + '/' + str(i)
+            with open(file_name + '_train.csv', 'w') as file:
+                for item in self.indices_dictionary[i]['train']:
+                    file.write("%s\n" % item)
+
+            with open(file_name + '_test.csv', 'w') as file:
+                for item in self.indices_dictionary[i]['test']:
+                    file.write("%s\n" % item)
 
     def load_indices(self):
         """ load indices and replace indices_dictionary by it """
@@ -209,10 +217,6 @@ class CrossValidator:
             self.indices_dictionary[i] = dic
 
         return self.indices_dictionary
-
-    def clean_predictions_dictionary(self):
-        """ clear all predictions """
-        self.predictions_dictionary = {}
 
     """"""""""""""""""""""""""""""""""""
 
