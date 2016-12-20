@@ -250,6 +250,7 @@ The number of iterations was fixed. The two other parameters were chosen with th
 
 %========================
 \section{Blending}
+\label{sec:blending}
 
 The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred different models. \cite{BellKore_netflix} Without having the same number of models, we proceed the same to obtain our final solution. We perform a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). 
 
@@ -348,7 +349,6 @@ The blending plays an important role in our project. For the large number of stu
 finding a good blend between them proved to be a complex task. The solution that we present pushes
 as much as possible the RMSE, while at the same time introducing a noticeable overfitting of the
 data.
-
 In this Section we will discuss about these aspects.
 
 %We can first discuss about the models. The models we used are quite simple. Therefore, using more
@@ -362,9 +362,38 @@ It should be legitimate to ask why we are keeping both normalized and unnormaliz
 median/mean. Looking at the coefficients gives a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized models. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
 
 \subsubsection{Blending choices}
+The role of the blending part is extremely important in obtaining the best score possible. The large
+number of models available would be pointless without a good blend. Moreover, we mainly consider
+simple models, leaving to the blender the task of building a more complex one.
 
+As mentioned in Section \ref{sec:blending} we used the Sequential Least Square Programming method to
+optimize the weighted sum of models. Simpler methods, like grid search, are computationally too
+expensive and less accurate than the algorithm used. We spent some time in finding the best
+optimization method for our purposes.
+
+We decided to also allow negative weight. This choice was made for two reasons:
+\begin{itemize}
+\item We obtained better results.
+\item Negative weights may help in better fitting the distribution of the training dataset. This can
+lead to overfitting, as we discuss in the next subsection, but, at the same time, it also produces
+better results.
+\end{itemize}
+We also did not put an contraint on the sum of the weight (i.e. the sum is not fixed  to 1) for the
+same reasons.
 
 \subsubsection{Overfitting}
+We apply several techniques to reduce as much as possible the overfitting of the models we used. In
+particular we used a 4-folds cross-validation both to determine the best parameters for each model, both to
+choose the best weights in the blending.
+Despite this, the model slightly overfits the data. For the Kaggle submission We obtained a score of \textcolor{red}{ADD
+SCORE} in the training dataset and \textcolor{red}{ADD SCORE} in the validation dataset. 
+In the cross validation we obtained a score of \textcolor{red}{ADD SCORE}.
+There are many possible reasons underlying this behaviour. Probably the blending process that we
+used, although the proven accuracy, introcudes too much complexity in the model, thus overfitting
+the training database.
+Using simpler models would solve this problem, but would worsen the prediction. We therefore decided
+to keep the more complex one.
+
 
 
 
