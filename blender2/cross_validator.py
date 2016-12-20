@@ -8,7 +8,11 @@
 # Distributed under terms of the MIT license.
 
 """
+Cross Validation prepared for blending modeling.
 
+USAGE FOR NEW VALIDATION:
+    cv = CrossValidator()
+    
 """
 
 import numpy as np
