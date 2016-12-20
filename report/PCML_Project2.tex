@@ -34,16 +34,37 @@
 % nice fraction
 \usepackage{units}
 
+\usepackage[T1]{fontenc}
+\usepackage{frcursive}
+\usepackage{calligra}
+\usepackage{pbsi}
+
+\newcommand{\setfont}[2]{{\fontfamily{#1}\selectfont #2}}
+
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+\usepackage{eso-pic}% http://ctan.org/pkg/eso-pic
+\usepackage{graphicx}% http://ctan.org/pkg/graphicx
+
+\usepackage[export]{adjustbox}% http://ctan.org/pkg/adjustbox
+
 
 
 \begin{document}
+
+%\AddToShipoutPictureBG{%
+%  \AtPageUpperLeft{\raisebox{-\height}{\includegraphics[width=1.5in]{img/Dori}}}%
+%}
+
 \title{PCML CS-433: Recommender System}
 
 \author{
-  Team: {\bf Netflix and MaCHILL Learning} \\
+  Team: {\bsifamily \large ``Just keep swimming !''} {\hspace{0.1cm} \includegraphics[width=0.3in ,valign=t]{img/Dori}} \\ \\
+    
+  %Team: {\bf Netflix and MaCHILL Learning} \\
   Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch \\
   Stefano Savar\`e, SCIPER 260960, stefano.savare@epfl.ch \\
-  Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch\\ \\
+  Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch\\ \\ 
+
   \textit{School of Computer and Communication Sciences, EPF Lausanne, Switzerland}
 }
 
