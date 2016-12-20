@@ -21,11 +21,10 @@ import os
 def elements_in_folder(folder):
     return len([name for name in os.listdir(folder)])
 
-
 class CrossValidator:
     """
     Class that provide a normalized version of the dataframe
-
+cv
     It provides all the method both to normalize the dataframe both to recover the right predictions
     from the predictions obtained from the normalized dataframe
     """
@@ -45,7 +44,6 @@ class CrossValidator:
     """ CROSS VALIDATION """
 
     """"""""""""""""""""""""""""""""""""
-
 
     def shuffle_indices(self, df, k):
         """ take a pandas.DataFrame and calculate k array of shuffled indices for cross-validation"""
@@ -102,28 +100,37 @@ class CrossValidator:
         predictions_dict = {}
         for i in range(len(self.indices_dictionary)):
             train = df.loc[self.indices_dictionary[i]['train']].sort_index()
-            test = df.loc[self.indices_dictionary[i]['train']].sort_index()
+            test = df.loc[self.indices_dictionary[i]['test']].sort_index()
 
             predictions = model(train, test, **kwargs)
             predictions_dict[i] = predictions
 
-        print(model_name)
         self.predictions_dictionary[model_name] = predictions_dict
 
         return predictions_dict
 
-    def k_fold_predictions_and_store(self, df, model, model_name, **kwargs):
+    def k_fold_predictions_and_store(self, df, model, model_name, override, **kwargs):
         """ produce k-fold predictions AND store the prediction in files """
-
+        print("Start Predictions for model %s"%model_name)
+        
         # check folder or create
         folder_name = './CV/' + model_name
-        create_folder(folder_name)
+        
+        compute = True
+        
+        if not override:
+            if os.path.isdir(folder_name):
+                compute = False
+                print("Predictions for model %s exist already"%model_name)
+        
+        if compute:
+            create_folder(folder_name)
 
-        pred_dict = self.k_fold_predictions(df, model, model_name, **kwargs)
+            pred_dict = self.k_fold_predictions(df, model, model_name, **kwargs)
 
-        for i in pred_dict.keys():
-            file_name = folder_name + '/' + str(i) + '.csv'
-            pred_dict[i].to_csv(file_name, index=False)
+            for i in pred_dict.keys():
+                file_name = folder_name + '/' + str(i) + '.csv'
+                pred_dict[i].to_csv(file_name, index=False)
 
     def evaluate_model(self, model_name, test_df):
         """ cross validation """
