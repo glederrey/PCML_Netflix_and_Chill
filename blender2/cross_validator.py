@@ -226,18 +226,25 @@ cv
 
     """"""""""""""""""""""""""""""""""""
 
-    def k_fold_predictions_and_store(self, df, model, model_name, **kwargs):
+    def k_fold_predictions_and_store(self, df, model, model_name, override, **kwargs):
         """ produce k-fold predictions AND store the prediction in files """
-
+       
         # check folder or create
-        folder_name = './CV/' + model_name
-        create_folder(folder_name)
+        folder_name = './CV/' + model_name       
+        
+        compute = True
+        if not override:
+            if os.path.isdir(folder_name):
+                compute = False
+            
+        if compute:
+            create_folder(folder_name)
 
-        pred_dict = self.k_fold_predictions(df, model, model_name, **kwargs)
+            pred_dict = self.k_fold_predictions(df, model, model_name, **kwargs)
 
-        for i in pred_dict.keys():
-            file_name = folder_name + '/' + str(i) + '.csv'
-            pred_dict[i].to_csv(file_name, index=False)
+            for i in pred_dict.keys():
+                file_name = folder_name + '/' + str(i) + '.csv'
+                pred_dict[i].to_csv(file_name, index=False)
 
     def store_predictions(self):
         """ dump predictions_dictionary in file """
