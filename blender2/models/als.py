@@ -7,64 +7,76 @@
 #
 # Distributed under terms of the MIT license.
 
+"""
+Matrix Factorization using Alternating Least Squares (ALS) from PySpark
+"""
+
 from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
 from rescaler import Rescaler
 import os
 
-''' 
-Matrix Factorization using Alternating Least Squares (ALS)
-It works with Spark RDD dataframes, but it accepts as input only Pandas dataframes and converts them to keep consistency between methods
-'''
 
-def predictions_ALS_rescaling(df_train, df_test, **kwargs):
+def predictions_ALS_rescaled(train, test, **kwargs):
     """
-    ALS with pyspark
-    First do a rescaling of the user in a way that they all have the same mean of rating.
-    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
-    appreciation of a movie.
+    ALS with PySpark rescaled.
 
-    :param df_train:
-    :param df_test:
-    :param kwargs:
-        gamma (float): regularization parameter
-        n_features (int): number of features for matrices
-        n_iter (int): number of iterations
-        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
-    :return:
-    """
-    rescaler = Rescaler(df_train)
-    df_train_normalized = rescaler.normalize_deviation()
-
-    prediction_normalized = predictions_ALS(df_train_normalized, df_test, **kwargs)
-    prediction = rescaler.recover_deviation(prediction_normalized)
-    return prediction
-
-def predictions_ALS(train_set, test_set, **kwargs):
-    """
-    Function to return the predictions of an ALS model.
+    First, a rescaling of the user such that they all have the same average of rating is done.
+    Then, the predictions are done using the function prediction_ALS().
+    Finally, the predictions are rescaled to recover the deviation of each user.
 
     Args:
-        train_set (pandas.DataFrame): train set
-        test_set (pandas.DataFrame): test set
-        spark_context (spark.SparkContext): spark context
-        **kwarg: Arbitrary keyword arguments. Passed to ALS.train()
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+        **kwargs: Arbitrary keyword arguments. Directly given to predictions_ALS().
 
     Returns:
         pandas.DataFrame: predictions, sorted by (Movie, User)
     """
-    
+    # Load the class Rescaler
+    rescaler = Rescaler(train)
+    # Normalize the train data
+    df_train_normalized = rescaler.normalize_deviation()
+
+    # Predict using the normalized trained data
+    prediction_normalized = predictions_ALS(df_train_normalized, test, **kwargs)
+    # Rescale the prediction to recover the deviations
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
+
+
+def predictions_ALS(train, test, **kwargs):
+    """
+    ALS with PySpark.
+
+    Compute the predictions on a test_set after training on a train_set using the method ALS from PySpark.
+
+    Args:
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+        **kwargs: Arbitrary keyword arguments. Passed to ALS.train() (Except for the spark_context)
+            spark_context (SparkContext): SparkContext passed from the main program. (Useful when using Jupyter)
+            rank (int): Rank of the matrix for the ALS
+            lambda (float): Regularization parameter for the ALS
+            iterations (int): Number of iterations for the ALS
+            nonnegative (bool): Boolean to allow negative values or not.
+
+    Returns:
+        pandas.DataFrame: predictions, sorted by (Movie, User)
+    """
+
+    # Delete folders that causes troubles
     os.system('rm -rf metastore_db')
     os.system('rm -rf __pycache__')
 
-    # take spark_context
+    # Extract Spark Context from the kwargs
     spark_context = kwargs.pop('spark_context')
 
     # Convert pd.DataFrame to Spark.rdd
     sqlContext = SQLContext(spark_context)
 
-    train_sql = sqlContext.createDataFrame(train_set).rdd
-    test_sql = sqlContext.createDataFrame(test_set).rdd
+    train_sql = sqlContext.createDataFrame(train).rdd
+    test_sql = sqlContext.createDataFrame(test).rdd
 
     # Train the model
     model = ALS.train(train_sql, **kwargs)

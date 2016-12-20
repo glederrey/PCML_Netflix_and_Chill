@@ -17,7 +17,7 @@ reproduce Kaggle's challenge predictions
 # import models
 from models.medians import *
 from models.means import *
-from models.collaborative_filtering import *
+from models.MF_RR import *
 from models.MF_SGD import *
 from models.als import predictions_ALS
 

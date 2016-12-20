@@ -7,6 +7,10 @@
 #
 # Distributed under terms of the MIT license.
 
+"""
+Matrix Factorization using Ridge Regression from sklearn.linear_model (MF-RR)
+"""
+
 import pandas as pd
 import numpy as np
 
@@ -14,38 +18,47 @@ from sklearn.linear_model import Ridge
 from rescaler import Rescaler
 
 
-def collaborative_filtering_rescaling(df_train, df_test, **kwargs):
+def mf_RR_rescaled(train, test, **kwargs):
     """
-    Collaborative Filtering
-    First do a rescaling of the user in a way that they all have the same mean of rating.
-    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
-    appreciation of a movie.
+    Matrix Factorization with Ridge Regression rescaled.
 
-    :param df_train:
-    :param df_test:
-    :param kwargs:
-        gamma (float): regularization parameter
-        n_features (int): number of features for matrices
-        n_iter (int): number of iterations
-        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
-    :return:
-    """
-    rescaler = Rescaler(df_train)
-    df_train_normalized = rescaler.normalize_deviation()
-
-    prediction_normalized = collaborative_filtering(df_train_normalized, df_test, **kwargs)
-    prediction = rescaler.recover_deviation(prediction_normalized)
-    return prediction
-
-
-def collaborative_filtering(train, test, **kwarg):
-    """
-    Function to return the prediction of the collaborative filtering implementation
+    First, a rescaling of the user such that they all have the same average of rating is done.
+    Then, the predictions are done using the function mf_RR().
+    Finally, the predictions are rescaled to recover the deviation of each user.
 
     Args:
         train (pandas.DataFrame): train set
         test (pandas.DataFrame): test set
-        **kwarg: Arbitrary keyword arguments.
+        **kwargs: Arbitrary keyword arguments. Directly given to mf_RR().
+
+    Returns:
+        pandas.DataFrame: predictions, sorted by (Movie, User)
+    """
+    # Load the class Rescaler
+    rescaler = Rescaler(train)
+    # Normalize the train data
+    df_train_normalized = rescaler.normalize_deviation()
+
+    # Predict using the normalized trained data
+    prediction_normalized = mf_RR(df_train_normalized, test, **kwargs)
+    # Rescale the prediction to recover the deviations
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
+
+
+def mf_RR(train, test, **kwargs):
+    """
+    Matrix Factorization with Ridge Regression.
+
+    Compute the predictions on a test set after training on a train_ et using a Matrix Factorization method
+    combined with Ridge Regression.
+
+    Args:
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+        **kwargs: Arbitrary keyword arguments.
+            movie_features (int): Number of features for the Matrix Factorization
+            alpha (float): Regularization parameter for the Ridge Regression
 
     Returns:
         pandas.DataFrame: predictions, sorted by (Movie, User)
@@ -57,7 +70,7 @@ def collaborative_filtering(train, test, **kwarg):
     Nu, Nm = len(users), len(movies)
 
     # Number of movie features
-    nbr_movie_features = kwarg['movie_features']
+    nbr_movie_features = kwargs['movie_features']
 
     # Matrix of user preferences
     U = pd.DataFrame(np.random.rand(Nu, nbr_movie_features), index=users, columns=range(1, nbr_movie_features + 1))
@@ -65,18 +78,27 @@ def collaborative_filtering(train, test, **kwarg):
     # Matrix of movie features
     M = pd.DataFrame(np.random.rand(Nm, nbr_movie_features), index=movies, columns=range(1, nbr_movie_features + 1))
 
+    # Deep copy (Just in case)
     U0, M0 = U.copy(), M.copy()
 
-    alpha = kwarg['alpha']
+    # Get alapha from kwargs
+    alpha = kwargs['alpha']
 
-    bestFit = {'U': U0, 'M': M0, 'error': np.inf}
-    fitUM(bestFit, alpha, U0, M0, train, rating, users, movies)
+    # Dict of best fit
+    best_fit = {'U': U0, 'M': M0, 'error': np.inf}
 
-    U_opt, M_opt, error = bestFit['U'], bestFit['M'], bestFit['error']
+    # Fit the Matrices U and M
+    fitUM(best_fit, alpha, U0, M0, train, rating, users, movies)
+
+    # Get best matrices
+    U_opt, M_opt, error = best_fit['U'], best_fit['M'], best_fit['error']
+
+    # Do the prediction
     pred_mat = predict(U_opt, M_opt)
 
     pred = []
 
+    # Post process the predictions and return the test DF.
     df_return = test.copy()
 
     for i in range(len(test)):
@@ -225,8 +247,10 @@ def fitUM(bestFit, alpha, U0, M0, train, rating, users, movies, tol=0.05):
 
     U, M = U0.copy(), M0.copy()
     error_history = []
+    # Fit a first time
     U, delta = fitU(U, M, train, rating, error_history, bestFit, alpha, users)
     tolerance = tol
+    # Then fit again in alternance until convergence
     while delta > tolerance:
         M, delta = fitM(U, M, train, rating, error_history, bestFit, alpha, movies)
         if delta > tolerance:
