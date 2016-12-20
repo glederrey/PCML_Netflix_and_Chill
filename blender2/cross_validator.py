@@ -8,11 +8,30 @@
 # Distributed under terms of the MIT license.
 
 """
-Cross Validation prepared for blending modeling.
+Cross Validation class for blending modeling.
 
-USAGE FOR NEW VALIDATION:
+
+USAGE FOR NEW CROSS-VALIDATOR:
     cv = CrossValidator()
-    
+    cv.new_validator(df, k)                                  # define indices and ground truth
+    cv.k_fold_predictions(self, df, 'als', als, **kwargs)    # compute predictions for model
+    cv.evaluate_model('als')                                 # cross-validation on model
+    (add more models)
+    cv.evaluate_blending({'als': 0.4, 'mf_sgd': 0.6})        # cross-validation of a blending
+
+USAGE FOR STORED MODEL PREDICTIONS:
+    cv = CrossValidator()
+    cv.load_indices()                                        # load indices from folder 'CV/indices'
+    model_names = ['slope_one_rescaled',
+                   'movie_mean_deviation_user',
+                   'knn_ib']
+    cv.load_predictions(model_names)                         # load predictions from folder 'CV/'
+    cv.define_ground_truth(df)                               # define the ground truth
+    cv.evaluation_all_models()
+    dic_blend = {'slope_one_rescaled': 0.038461538461538464,
+                 'movie_mean_deviation_user': 0.038461538461538464,
+                 'knn_ib': 0.038461538461538464}
+    cv.evaluate_blending(dic_blend)                          # cross-validation of a blending
 """
 
 import numpy as np
