@@ -60,29 +60,29 @@
 %obtained through a clever blend of several models.
 %Exploiting this approach we blended 12 different methods (8 direct scoring method and 4 iterative
 %ones) eventually achieving around 0.977 RMSE on the Kaggle's EPFL ML Recommender System challenge. 
-Active Collaborative Filtering Recommender Systems for movies collection blending 12 different methods (8 direct scoring method and 4 iterative ones) in order to achieve around 0.977 RMSE on Kaggle's EPFL ML Recommender System challenge. 
+Active Collaborative Filtering Recommender Systems for movie collection blending 12 different methods (8 direct scoring methods and 4 iterative ones) in order to achieve around 0.977 RMSE on Kaggle's EPFL ML Recommender System challenge. 
 \end{abstract}
 
 %========================
 \section{Introduction}
 
-Collaborative filtering is a set of techniques aiming at the creation of recommander systems. Usually, we define three types of collaboratif filter: \textbf{active}, \textbf{passive} and \textbf{content-based} (the best one being obviously a mix of the three). In industry, recommender are mainly used to suggest new item to users based on their taste: movies, musics, items to purchase, ...
+Collaborative filtering is a set of techniques aiming at the creation of recommender systems. Usually, we define three types of collaborative filter: \textbf{active}, \textbf{passive} and \textbf{content-based} (the best one being obviously a mix of the three). In industry, recommenders are mainly used to suggest new item to users based on their taste: movies, music tracks, items to purchase, ...
 
-The objective of the project is to develop a recommender system using \textbf{active collaborative filtering} (i.e. pseudonymized items \footnote{Items anonymised by an ID, i.e. we do not have access to neither the name nor any content of it.} rated by pseudonymized users).
+The objective of the project is to develop a recommender system using \textbf{active collaborative filtering} (i.e. pseudonymised items \footnote{Items anonymized by an ID, i.e. we do not have access to neither the name nor any content of it.} rated by pseudonymised users).
 
 We will first go through a general \textbf{data analysis} in order to the quality of the data (spammers and participation of the users). Then we will test different models, starting from a basic mean given a prediction baseline and improving the score with more advanced algorithms.
 
-According to several studies [1] [2] the best results are obtained through a clever blend of several models. Exploiting this approach \textbf{we ultimately blended 12 different methods (8 direct scoring method and 4 iterative ones)} eventually achieving around 0.977 RMSE. \textcolor{red}{TO BE UPDATED WITH LATEST NUMBERS}
+According to several studies [1] [2] the best results are obtained through a clever blend of several models. Exploiting this approach, \textbf{we ultimately blended 12 different methods (8 direct scoring methods and 4 iterative ones)} eventually achieving around 0.977 RMSE. \textcolor{red}{TO BE UPDATED WITH THE LATEST NUMBERS}
 
 The implemented model will be part of the \textbf{Kaggle's EPFL ML Recommender System} challenge in which predictions are rated by their RMSE compared with ground truth values. All external libraries are allowed as long as they are properly documented.
 
 %========================
-\section{Data description}
+\section{Data Description}
 
-The data represent ratings from $10'000$ users on $1'000$ movies in an integer scale from 1 to 5. Both of them are pseudonymized by an ID. This scale represent the number of \textit{stars} given by the users, 1 being the lowest grade and 5 the best.
+The data represent ratings from $10'000$ users on $1'000$ movies in an integer scale from 1 to 5. Both of them are pseudonymized by an ID. This scale represents the number of \textit{stars} given by the users, 1 being the lowest grade and 5 the best.
 
 The training set used to train our algorithm contains $1'176'952$ ratings which represent around 12\% of filled ratings. 
-An other $1'176'952$ ratings are hidden from us and must be predicted by our recommender algorithm in order to be scored on Kaggle plateforme.
+Another $1'176'952$ ratings are hidden from us and must be predicted by our recommender algorithm in order to be scored on Kaggle platform.
 
 
 %\begin{figure}[htbp]%------- PICTURE---------
@@ -124,24 +124,24 @@ An other $1'176'952$ ratings are hidden from us and must be predicted by our rec
 
 
 %========================
-\section{Data exploration}
+\section{Data Exploration}
 
 \subsection{Search for spammers}
 
-One of the first step before starting learning from data is to ensure that they are real ones, and not produced by bots (spammers). As we know spammers can act in different ways: \textbf{uniform spammer} constantly rates movie in the same way, while \textbf{random spammers} randomly rates movies. In order to check their existence, we analyzed the variances of user ratings: uniform spammer would be put in evidence by null variance, while random spammer will present abnormally high variance. Figure (\ref{variances}) shows the gaussian distribution of the rating variances and ensure the data are free of spammers.
+One of the first step before starting learning from data is to ensure that they are real ones, and not produced by bots (spammers). As we know, spammers can act in different ways: \textbf{uniform spammers} constantly rate movies in the same way, while \textbf{random spammers} randomly rate movies. In order to check their existence, we analyzed the variances of user ratings: uniform spammers would be put in evidence by null variance, while random spammers present abnormally high variance. Figure (\ref{variances}) shows the Gaussian distribution of the rating variances and ensure the data are free of spammers.
 
-\subsection{Participation of users}
+\subsection{Participation of Users}
 
-Even free of spammers, data can still contains \textbf{inactive users}, i.e. users which subscribed to a plateform but never use it or never rate movies. If they are in too big number compared with active user, they can disturb learning algorithms. Figure (\ref{number_ratings}) shows histogram of number of movies rated by users and confirm us the good participation of the users.
+Even free of spammers, data can still contain \textbf{inactive users}, i.e. users who subscribed to a platform but never use it or never rate movies. If they are in too big number compared with active users, they can disturb learning algorithms. Figure (\ref{number_ratings}) shows histograms of number of movies rated by users and confirm us the good participation of the users.
 
-\subsection{User "moods" (deviation)}
+\subsection{User "Moods" (Deviation)}
 
-Because of mood/education//habits users having the same appreciation of a movie can rate it differently. Indeed, we show in figure (\ref{mood}) that some users systematically rate lower/higher that others. It's important to take this effect into account in both evaluation of a movie and recommendation for the user and proceed to a normalization of the ratings.
+Because of mood/education//habits users having the same appreciation of a movie can rate it differently. Indeed, we show in the figure (\ref{mood}) that some users systematically rate lower/higher than others. It's important to take this effect into account in both evaluation of a movie and recommendation for the user and proceed to a normalization of the ratings.
 
 \begin{figure}[htbp] %-------------- FIGURE -------------
   \centering
   \includegraphics[width=\columnwidth]{img/Deviation_mean}
-  \caption{Difference of mean rating per user compared with overall mean.}
+  \caption{Difference of mean ratings per user compared with overall mean.}
   \vspace{-3mm}
   \label{mood}
 \end{figure}
@@ -151,7 +151,7 @@ Because of mood/education//habits users having the same appreciation of a movie 
 
 \subsection{Global mean/median (2 models)}
 
-The most simple model is to take all the ratings in the train set and apply the mean or the median value. We return this value as the prediction. This give a baseline from which we can compare further model.
+The simplest model is to take all the ratings in the train set and apply the mean or the median value. We return this value as the prediction. This give a baseline score from which we can compare further models.
 
 \subsection{User/Movie mean/median (4 models)}
 
@@ -176,7 +176,7 @@ where $\overline{m}$ is either the mean or the median of the ratings on the movi
 \label{sec:mf-sgd}
 Matrix factorization techniques proved to be one of the most effective strategies to implement 
 recommender systems. Given $D$ items, $N$ users and the corresponding rating matrix 
-$X \in \mathbb{R}^{D \times N}$, we aim to find two matrixes $W \in \mathbb{R}^{D \times K}$ and $Z
+$X \in \mathbb{R}^{D \times N}$, we aim to find two matrices $W \in \mathbb{R}^{D \times K}$ and $Z
 \in \mathbb{R}^{N \times K}$ such that the quantity 
 
 \begin{multline}
@@ -187,11 +187,11 @@ E = \frac{1}{2} \sum_{\substack{d=1,...,D \\n=1,...,N}}
 \end{multline} 
 
 is minimized. $K$ is a parameter,
-corresponding of the number of the \textit{latent factors}; $\lambda$ is a scalar 
+corresponding to the number of the \textit{latent factors}; $\lambda$ is a scalar 
 that weight the regularization terms.
 
 Different techniques have been deployed to solve this minimization problem. In this Subsection we
-will present the Stocastic Gradient Descent method, while in the next one we will explain the
+will present the Stochastic Gradient Descent method, while in the next one we explain the
 Alternating Least Square optimization. 
 The Stochastic Gradient Descent method is a faster variant of the standard gradient descent
 optimization. The gradient of the functional \ref{eq:functional} is computed only on a single
@@ -199,14 +199,14 @@ element of the summation, randomly chosen. The update process then follows the s
 gradient descent.
 An almost certain convergence to a local minimum is guaranteed under not restrictive hypothesis.
 
-Using the \texttt{scipy.sparse} matrices library, we implemented the SGD method from scratch.
-Through a cross validation process we chosed the best values for the paramester $K$, $\lambda$ and
+Using the \texttt{scipy.sparse} matrix library, we implemented the SGD method from scratch.
+Through a cross validation process we chose the best values for the parameters $K$, $\lambda$ and
 the number of iterations. The results that we obtained will be presented in Section
 \ref{sec:model_bench}.
 
 \subsection{Matrix Factorization using Alternating Least Square (ALS)}
 ALS is one of the main alternatives to the SGD to solve the problem \ref{eq:functional}.
-It is an iterative algorithm consisting in alternately fixing one of the two matrixes $W$ or $Z$,
+It is an iterative algorithm consisting in alternately fixing one of the two matrices $W$ or $Z$,
 while optimizing the problem \ref{eq:functional} with respect to the other matrix.
 The optimization problem at each iteration is much easier to solve compared to the one solved by the
 SGD. A simple least squares technique can be exploited.
@@ -233,7 +233,7 @@ cross validation to choose the best parameters, whose results will be discussed 
 %the most advanced matrix factorization libraries.
 %\end{itemize}
 
-PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012}, one of the more advanced matrix factorization libraries. It can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD \ref{sec:mf-sgd}. 
+PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012}, one of the most advanced matrix factorization libraries. It can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD \ref{sec:mf-sgd}. 
 
 The usage of this library is really simple. It uses a few parameters:
 \begin{itemize}
@@ -251,7 +251,7 @@ The number of iterations was fixed. The two other parameters were chosen with th
 %========================
 \section{Blending}
 
-The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred of different models. \cite{BellKore_netflix} Without having the same amout of models, we proceed the same to obtain our final solution. We performe a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). 
+The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred different models. \cite{BellKore_netflix} Without having the same number of models, we proceed the same to obtain our final solution. We perform a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). 
 
 \subsection{SLSQP method}
 Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. Unlike Newton method, it does not compute the Hessian matrix but estimates it by successive gradient vector analyze \cite{wiki:quasi_newton} using \textbf{Broyden-Fletcher-Goldfarb-Shanno} algorithm (BFGS). This method allows optimization for function without knowing Hessian matrix, in a short computation time.
@@ -261,7 +261,7 @@ Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. U
 
 In order to create our recommender algorithm, 2 steps are required. 
 \begin{enumerate}
-\item Find the best parameters for each models. A cross validation process was performed on the models MF-SGD, ALS, Collab. Filtering and PyFM. %The first step is to find the best parameters for each models. Therefore, a cross validation process was used on the models MF-SGD, ALS, Collab. Filtering and PyFM. 
+\item Find the best parameters for each model. A cross validation process was performed on the models MF-SGD, ALS, Collab. Filtering and PyFM. %The first step is to find the best parameters for each models. Therefore, a cross validation process was used on the models MF-SGD, ALS, Collab. Filtering and PyFM. 
 \item Apply the blending between all the models with another cross validation process.%Once the best parameters are found, the blending is applied between all the models with another cross validation process. 
 \end{enumerate}
 In this section, we first present the blending of the models as well as their parameters found after cross validation. Then, we present the benchmarks of the models and the blending.
@@ -334,15 +334,15 @@ blending			& 0.96191 \\
   \label{benchmark}
 \end{table}
 
-The blending gives a RMSE of \textcolor{red}{0.97788} on Kaggle's plateforme. 
+The blending gives a RMSE of \textcolor{red}{0.97788} on Kaggle's platform. 
 
 %========================
 \section{Discussion of the results}
 
-Excluding the trivial models based on the users/movies means/medians, we mainly focused on Matrix
-Factorization algorithms, exploiting different techniques to achieve the best factorization
+Excluding the trivial models based on the user/movie mean/median, we mainly focused on \textbf{Matrix
+Factorization algorithms}, exploiting different techniques to achieve the best factorization
 possible. Content-based filtering algorithms are not suited for this problem since the users and the
-movies are fully anonymized and without additional informations.
+movies are fully anonymized and without additional information.
 
 The blending plays an important role in our project. For the large number of studied models,
 finding a good blend between them proved to be a complex task. The solution that we present pushes
@@ -356,10 +356,10 @@ In this Section we will discuss about these aspects.
 
 \subsubsection{Choice of the models}
 
-\subsubsection{Why keeping model with and without normalization?}
+\subsubsection{Why keep models with and without normalization?}
 
-It should be legitimate to ask why are we keeping both normalized and unnormalized model for
-median/mean. Looking at the coefficients give a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized model. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
+It should be legitimate to ask why we are keeping both normalized and unnormalized model for
+median/mean. Looking at the coefficients gives a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized models. The effect is that the method is more taken into account for users in the tail of the mood curve than for the central ones. Then, it allows the optimizer to have finer control on the blending.
 
 \subsubsection{Blending choices}
 
