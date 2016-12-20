@@ -51,25 +51,38 @@
 
 %========================
 \begin{abstract}
-Recommender systems are one of the more dynamic fields in the machine learning world. Almost all
-internet companies have to keep track and to analyze the user preferences and the interest about the
-more recent and advanced algorithm is spreading fast.
-In this paper we analyse  different approaches to this problem using a standard movie recommendation
-dataset with only the user ratings informations and the RMSE metric.
-According to several studies \cite{BellKore_netflix} \cite{schafer2002meta} the best results are
-obtained through a clever blend of several models.
-Exploiting this approach we blended 12 different methods (8 direct scoring method and 4 iterative
-ones) eventually achieving around 0.977 RMSE on the Kaggle's EPFL ML Recommender System challenge. 
-%Collaborative Filtering Recommender Systems for movies collection blending 12 different methods (8 direct scoring method and 4 iterative ones) in order to achieve around 0.977 RMSE on Kaggle's EPFL ML Recommender System challenge. 
+%Recommender systems are one of the more dynamic fields in the machine learning world. Almost all
+%internet companies have to keep track and to analyze the user preferences and the interest about the
+%more recent and advanced algorithm is spreading fast.
+%In this paper we analyse  different approaches to this problem using a standard movie recommendation
+%dataset with only the user ratings informations and the RMSE metric.
+%According to several studies \cite{BellKore_netflix} \cite{schafer2002meta} the best results are
+%obtained through a clever blend of several models.
+%Exploiting this approach we blended 12 different methods (8 direct scoring method and 4 iterative
+%ones) eventually achieving around 0.977 RMSE on the Kaggle's EPFL ML Recommender System challenge. 
+Active Collaborative Filtering Recommender Systems for movies collection blending 12 different methods (8 direct scoring method and 4 iterative ones) in order to achieve around 0.977 RMSE on Kaggle's EPFL ML Recommender System challenge. 
 \end{abstract}
+
+%========================
+\section{Introduction}
+
+Collaborative filtering is a set of techniques aiming at the creation of recommander systems. Usually, we define three types of collaboratif filter: \textbf{active}, \textbf{passive} and \textbf{content-based} (the best one being obviously a mix of the three). In industry, recommender are mainly used to suggest new item to users based on their taste: movies, musics, items to purchase, ...
+
+The objective of the project is to develop a recommender system using \textbf{active collaborative filtering} (i.e. pseudonymized items \footnote{Items anonymised by an ID, i.e. we do not have access to neither the name nor any content of it.} rated by pseudonymized users).
+
+We will first go through a general \textbf{data analysis} in order to the quality of the data (spammers and participation of the users). Then we will test different models, starting from a basic mean given a prediction baseline and improving the score with more advanced algorithms.
+
+According to several studies [1] [2] the best results are obtained through a clever blend of several models. Exploiting this approach \textbf{we ultimately blended 12 different methods (8 direct scoring method and 4 iterative ones)} eventually achieving around 0.977 RMSE. \textcolor{red}{TO BE UPDATED WITH LATEST NUMBERS}
+
+The implemented model will be part of the \textbf{Kaggle's EPFL ML Recommender System} challenge in which predictions are rated by their RMSE compared with ground truth values. All external libraries are allowed as long as they are properly documented.
 
 %========================
 \section{Data description}
 
-The data represent ratings from $10'000$ users on $1'000$ movies in an integer scale from 1 to 5. This scale represent the number of \textit{stars} given by the users, 1 being the lowest grade and 5 the best.
+The data represent ratings from $10'000$ users on $1'000$ movies in an integer scale from 1 to 5. Both of them are pseudonymized by an ID. This scale represent the number of \textit{stars} given by the users, 1 being the lowest grade and 5 the best.
 
-The training set used to train our algorithm contains $1'176'952$ ratings which represent around 12\% of possible filled ratings. 
-An other $1'176'952$ ratings are hidden from us and must be predicted by our recommender algorithm.
+The training set used to train our algorithm contains $1'176'952$ ratings which represent around 12\% of filled ratings. 
+An other $1'176'952$ ratings are hidden from us and must be predicted by our recommender algorithm in order to be scored on Kaggle plateforme.
 
 
 %\begin{figure}[htbp]%------- PICTURE---------
@@ -231,9 +244,9 @@ The usage of this library is really simple. It uses a few parameters:
 
 The number of iterations was fixed. The two other parameters were chosen with the use of a simple cross validation process.
 
-\subsection{Collaborative Filtering}
+\subsection{Matrix Factorization using Ridge Regression (MF-RR)}
 
-This algorithm is nothing more than another implementation \textcolor{red}{An other implementation of what?}
+\textcolor{red}{Small description}
 
 %========================
 \section{Blending}
@@ -242,7 +255,7 @@ This algorithm is nothing more than another implementation \textcolor{red}{An ot
 The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred of different models. \cite{BellKore_netflix} Without having the same amout of models, we proceed the same to obtain our final solution. We performe a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). 
 
 \subsection{SLSQP method}
-Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. It differs from Newton method by computing the Hessian matrix but by estimating it by successive gradient vector analyze \cite{wiki:quasi_newton}. It's
+Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. Unlike Newton method, it does not compute the Hessian matrix but estimates it by successive gradient vector analyze \cite{wiki:quasi_newton} using \textbf{Broyden-Fletcher-Goldfarb-Shanno} algorithm (BFGS). This method allows optimization for function without knowing Hessian matrix, in a short computation time.
 
 %========================
 \section{Result}
@@ -322,7 +335,7 @@ blending			& 0.96191 \\
   \label{benchmark}
 \end{table}
 
-The models were not tested individually on the Kaggle Public dataset. The blending gives a result of \textcolor{red}{0.97788}. 
+The blending gives a RMSE of \textcolor{red}{0.97788} on Kaggle's plateforme. 
 
 %========================
 \section{Discussion of the results}
