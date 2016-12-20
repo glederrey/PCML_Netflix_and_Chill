@@ -9,13 +9,38 @@
 
 from pyspark.sql import SQLContext
 from pyspark.mllib.recommendation import ALS
+from rescaler import Rescaler
+import os
 
 ''' 
 Matrix Factorization using Alternating Least Squares (ALS)
 It works with Spark RDD dataframes, but it accepts as input only Pandas dataframes and converts them to keep consistency between methods
 '''
 
-def predictions_ALS(train_set, test_set, **kwarg):
+def predictions_ALS_rescaling(df_train, df_test, **kwargs):
+    """
+    ALS with pyspark
+    First do a rescaling of the user in a way that they all have the same mean of rating.
+    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
+    appreciation of a movie.
+
+    :param df_train:
+    :param df_test:
+    :param kwargs:
+        gamma (float): regularization parameter
+        n_features (int): number of features for matrices
+        n_iter (int): number of iterations
+        init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
+    :return:
+    """
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
+
+    prediction_normalized = predictions_ALS(df_train_normalized, df_test, **kwargs)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
+
+def predictions_ALS(train_set, test_set, **kwargs):
     """
     Function to return the predictions of an ALS model.
 
@@ -28,9 +53,12 @@ def predictions_ALS(train_set, test_set, **kwarg):
     Returns:
         pandas.DataFrame: predictions, sorted by (Movie, User)
     """
+    
+    os.system('rm -rf metastore_db')
+    os.system('rm -rf __pycache__')
 
     # take spark_context
-    spark_context = kwarg['spark_context']
+    spark_context = kwargs.pop('spark_context')
 
     # Convert pd.DataFrame to Spark.rdd
     sqlContext = SQLContext(spark_context)
@@ -39,7 +67,7 @@ def predictions_ALS(train_set, test_set, **kwarg):
     test_sql = sqlContext.createDataFrame(test_set).rdd
 
     # Train the model
-    model = ALS.train(train_sql, **kwarg)
+    model = ALS.train(train_sql, **kwargs)
 
     # Get the predictions
     data_for_predictions = test_sql.map(lambda x: (x[0], x[1]))

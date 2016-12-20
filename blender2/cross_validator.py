@@ -25,21 +25,21 @@ def elements_in_folder(folder):
 class CrossValidator:
     """
     Class that provide a normalized version of the dataframe
-
+cv
     It provides all the method both to normalize the dataframe both to recover the right predictions
     from the predictions obtained from the normalized dataframe
     """
 
     def __init__(self):
         """
-        It stores internally the dataframe and it computes the most relevant quantities about it.
-
-        @ params
-            - df, the PD dataframe to normalize
+        Store internally :
+            prediction_dictionary: dict of prediction for all prediction (k predictions per model for CV)
+            indices_dictionary: indices used for the k predictions (train and test)
+            truth_dictionary: ground truth for the k prediction
         """
         self.indices_dictionary = None
+        self.truth_dictionary = None
         self.predictions_dictionary = {}
-        self.ground_truth_dictionary = None
 
     """"""""""""""""""""""""""""""""""""
 
@@ -47,6 +47,14 @@ class CrossValidator:
 
     """"""""""""""""""""""""""""""""""""
 
+    def new_validator(self, df, k, store=False):
+        if store:
+            self.indices_dictionary = self.define_indices_and_store(df, k)
+        else:
+            self.indices_dictionary = self.define_indices(df, k)
+
+        self.truth_dictionary = self.define_ground_truth(df)
+        self.predictions_dictionary = {}
 
     def define_indices(self, df, k):
         """ take a pandas.DataFrame and calculate k array of shuffled indices for cross-validation"""
@@ -101,27 +109,93 @@ class CrossValidator:
             predictions = model(train, test, **kwargs)
             predictions_dict[i] = predictions
 
-        print(model_name)
         self.predictions_dictionary[model_name] = predictions_dict
 
         return predictions_dict
 
     def define_ground_truth(self, df):
+        dic_truth = {}
+        for i in self.indices_dictionary.keys():
+            dic_truth[i] = df.loc[self.indices_dictionary[i]['test']]
 
-
-    def evaluate_model(self, model_name, test_df):
-        """ cross validation """
-        rmse_list = []
-        for i in self.predictions_dictionary[model_name].keys():
-            pred = self.predictions_dictionary[model_name][i]
-            test = test_df.loc[self.indices_dictionary[i]['test']]
-
-            rmse = evaluate(pred, test)
-            rmse_list.append(rmse)
-        return np.mean(rmse_list)
+        self.truth_dictionary = dic_truth
+        return dic_truth
 
     def print_models(self):
         print(list(self.predictions_dictionary.keys()))
+
+    """"""""""""""""""""""""""""""""""""
+
+    """ EVALUATION """
+
+    """"""""""""""""""""""""""""""""""""
+
+    def evaluate_model(self, model_name):
+        """ cross validation """
+        if model_name not in self.predictions_dictionary.keys():
+            print("[ERROR] Model not defined in class: ", model_name)
+
+        rmse = self.__inner_evaluate_model(self.predictions_dictionary[model_name])
+        return rmse
+
+    def __inner_evaluate_model(self, predictions_dict):
+        if self.truth_dictionary is None:
+            print("[ERROR] No ground truth dictionary defined")
+            sys.exit()
+
+        rmse_list = []
+        for i in predictions_dict.keys():
+            pred = predictions_dict[i]
+            truth = self.truth_dictionary[i]
+
+            rmse = evaluate(pred, truth)
+            rmse_list.append(rmse)
+        return np.mean(rmse_list)
+
+    def evaluation_all_models(self):
+        for model_name in self.predictions_dictionary.keys():
+            rmse = self.evaluate_model(model_name)
+            print("RMSE for ", model_name, " : ", rmse)
+
+    """"""""""""""""""""""""""""""""""""
+
+    """ BLENDING """
+
+    """"""""""""""""""""""""""""""""""""
+
+    def blend(self, weights):
+        """ produce blended prediction with weights dictionary"""
+
+        # initial predictions df
+        random_name = list(self.predictions_dictionary.keys())[0]
+        pred = {}
+
+        # produce a new prediction DataFrame, based on any model DF (just in order to have indices)
+        for i in self.predictions_dictionary[random_name].keys():
+            pred[i] = pd.DataFrame.copy(self.predictions_dictionary[random_name][i])
+            pred[i]['Rating'] = 0.0
+
+        # add one by one weighted models
+        for model_name in weights.keys():
+            if model_name not in self.predictions_dictionary.keys():
+                print("[WARNING] Model does not exist in class: ", model_name)
+            else:
+                for i in self.predictions_dictionary[model_name].keys():
+                    pred[i]['Rating'] += \
+                        weights[model_name] * self.predictions_dictionary[model_name][i]['Rating']
+
+        return pred
+
+    def evaluate_blending(self, weights):
+        """ cross-validate blended prediction """
+        if self.truth_dictionary is None:
+            print("[ERROR] No ground truth dictionary defined")
+
+        blend_dict = self.blend(weights)
+
+        rmse = self.__inner_evaluate_model(blend_dict)
+
+        return rmse
 
     """"""""""""""""""""""""""""""""""""
 
@@ -218,38 +292,4 @@ class CrossValidator:
 
         return self.indices_dictionary
 
-    """"""""""""""""""""""""""""""""""""
 
-    """ BLENDING """
-
-    """"""""""""""""""""""""""""""""""""
-
-    def blend(self, weights):
-        """ produce blended prediction with weights dictionary"""
-        # initial predictions df
-        random_name = list(weights.keys())[0]
-        pred = {}
-
-        for i in self.predictions_dictionary[random_name].keys():
-            pred[i] = pd.DataFrame.copy(self.predictions_dictionary[random_name][i])
-            pred[i]['Rating'] = 0.0
-
-        for model_name in self.predictions_dictionary.keys():
-            for i in self.predictions_dictionary[model_name].keys():
-                pred[i]['Rating'] += \
-                    weights[model_name] * self.predictions_dictionary[model_name][i]['Rating']
-
-        return pred
-
-    def evaluate_blending(self, weights, df):
-        """ cross-validate blended prediction """
-        blend_dict = self.blend(weights)
-
-        list_rmse = []
-        for i in blend_dict.keys():
-            pred = blend_dict[i]
-            test = df.loc[self.indices_dictionary[i]['test']]
-            rmse = evaluate(pred, test)
-            list_rmse.append(rmse)
-
-        return np.mean(list_rmse)

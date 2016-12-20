@@ -18,8 +18,10 @@ Functions have the following signature:
         pandas.DataFrame: predictions, sorted by (Movie, User)
 """
 
+from models.helpers_scipy import *
 from helpers import *
 import pandas as pd
+from rescaler import Rescaler
 
 
 def user_mean(train, test):
@@ -44,6 +46,13 @@ def user_mean(train, test):
 
     return predictions
 
+def movie_mean_rescaling(df_train, df_test):
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
+
+    prediction_normalized = movie_mean(df_train_normalized, df_test)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
 
 def movie_mean(train, test):
     """ movie mean """
@@ -87,7 +96,14 @@ def global_mean(train, test):
 
     return predictions
 
+def movie_mean_deviation_user_rescaling(df_train, df_test):
+    rescaler = Rescaler(df_train)
+    df_train_normalized = rescaler.normalize_deviation()
 
+    prediction_normalized = movie_mean_deviation_user(df_train_normalized, df_test)
+    prediction = rescaler.recover_deviation(prediction_normalized)
+    return prediction
+    
 def movie_mean_deviation_user(train, test):
     """ movie mean rescaled with the 'deviation_per_user' file """
 
