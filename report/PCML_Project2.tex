@@ -34,16 +34,6 @@
 % nice fraction
 \usepackage{units}
 
-\usepackage[T1]{fontenc}
-\usepackage{frcursive}
-\usepackage{calligra}
-\usepackage{pbsi}
-
-\newcommand{\setfont}[2]{{\fontfamily{#1}\selectfont #2}}
-
-\usepackage{lipsum}% http://ctan.org/pkg/lipsum
-\usepackage{eso-pic}% http://ctan.org/pkg/eso-pic
-\usepackage{graphicx}% http://ctan.org/pkg/graphicx
 
 \usepackage[export]{adjustbox}% http://ctan.org/pkg/adjustbox
 
@@ -142,7 +132,7 @@ Another $1'176'952$ ratings are hidden from us and must be predicted by our reco
         \caption{Number of movies rated per user. Good user participation.}
         \label{number_ratings}
     \end{subfigure}
-    \caption{Statistical description of data \textcolor{red}{Refact label axis}}
+    \caption{Statistical description of the data}
 \end{figure}
 
 
@@ -164,7 +154,7 @@ Because of mood/education//habits users having the same appreciation of a movie 
 \begin{figure}[htbp] %-------------- FIGURE -------------
   \centering
   \includegraphics[width=\columnwidth]{img/Deviation_mean}
-  \caption{Difference of mean ratings per user compared with overall mean.}
+  \caption{Difference of rating mean of each user compared with overall mean. Illustrates the differences of judgement that users give in average or what we call in this paper the "moods".}
   \vspace{-3mm}
   \label{mood}
 \end{figure}
@@ -278,19 +268,56 @@ The number of iterations was fixed. The two other parameters were chosen with th
 The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred different models. \cite{BellKore_netflix} Without having the same number of models, we proceed the same to obtain our final solution. We perform a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). \textcolor{red}{Justify the negative weights as being not only "weights" but also the result of an optimization, and then treated as factor that can compensate between themselves.}
 
 \subsection{SLSQP method}
+\label{SLSQP}
 Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. Unlike Newton method, it does not compute the Hessian matrix but estimates it by successive gradient vector analyze \cite{wiki:quasi_newton} using \textbf{Broyden-Fletcher-Goldfarb-Shanno} algorithm (BFGS). This method allows optimization for function without knowing Hessian matrix, in a short computation time.
 
 %========================
 \section{Result}
 
-In order to create our recommender algorithm, 2 steps are required. 
+In order to create our recommender algorithm, we followed 2: 
 \begin{enumerate}
-\item Find the best parameters for each model. A cross validation process was performed on the models MF-SGD, ALS, Collab. Filtering and PyFM. \textcolor{red}{Are the CV not done on all the models ???}
+\item Tuning the parameters for each model one-by-one following a grid-search method scored by a 5-folds Cross-Validation
 %The first step is to find the best parameters for each models. Therefore, a cross validation process was used on the models MF-SGD, ALS, Collab. Filtering and PyFM. 
-\item Apply the blending between all the models with another cross validation process.%Once the best parameters are found, the blending is applied between all the models with another cross validation process. 
+\item Optimizing the weights for each model prediction produced by the previous step, by running a SLSQP (as explained in section \ref{SLSQP}) optimization method and by computing a 5-folds Cross-Validation score at each step of the algorithm. 
 \end{enumerate}
-In this section, we first present the blending of the models as well as their parameters found after cross validation. Then, we present the benchmarks of the models and the blending.
 
+
+% ==============================
+\subsection{Benchmark}
+\label{sec:model_bench}
+
+Table \ref{benchmark} presents the average RMSE of each model applied on the validation sets for the blending cross validation process. Last line is the result of the blending on the same validation sets.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}[c]{| l r |}
+\hline
+Model & RMSE \\
+\hline 
+\hline
+Global mean			& 1.11906 \\
+Global median			& 1.12812 \\
+User mean			& 1.09531 \\
+User median			& 1.15200 \\
+Movie mean			& 1.03050 \\
+Movie mean (mood norm.)		& 0.99659 \\
+Movie median			& 1.09957 \\
+Movie median (mood norm.)	& 1.05784 \\
+MF-SGD (mood normalization)	& 0.99994 \\
+ALS				& 0.98875 \\
+Collab. Filtering		& 1.02776 \\
+PyFM				& 0.99178 \\ \hline\hline
+blending			& 0.96191 \\ 
+\hline
+\end{tabular}
+  \caption{Benchmark of models.}
+  \label{benchmark}
+\end{table}
+
+The blending gives a RMSE of \textcolor{red}{0.97788} on Kaggle's platform. 
+
+
+% ===================================================
 \subsection{Blending}
 
 Table \ref{blending} provides the weights after minimizing on the average RMSE. It also provides the parameters used for each model.
@@ -327,40 +354,6 @@ PyFM				& 0.30050 	& \specialcell[t]{factors = 20\\
   \caption{Blending of models.}
   \label{blending}
 \end{table}
-
-\subsection{Benchmark}
-\label{sec:model_bench}
-
-Table \ref{benchmark} presents the average RMSE of each model applied on the validation sets for the blending cross validation process. Last line is the result of the blending on the same validation sets.
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}[c]{| l r |}
-\hline
-Model & RMSE \\
-\hline 
-\hline
-Global mean			& 1.11906 \\
-Global median			& 1.12812 \\
-User mean			& 1.09531 \\
-User median			& 1.15200 \\
-Movie mean			& 1.03050 \\
-Movie mean (mood norm.)		& 0.99659 \\
-Movie median			& 1.09957 \\
-Movie median (mood norm.)	& 1.05784 \\
-MF-SGD (mood normalization)	& 0.99994 \\
-ALS				& 0.98875 \\
-Collab. Filtering		& 1.02776 \\
-PyFM				& 0.99178 \\ \hline\hline
-blending			& 0.96191 \\ 
-\hline
-\end{tabular}
-  \caption{Benchmark of models.}
-  \label{benchmark}
-\end{table}
-
-The blending gives a RMSE of \textcolor{red}{0.97788} on Kaggle's platform. 
-
 %========================
 \section{Discussion of the results}
 
