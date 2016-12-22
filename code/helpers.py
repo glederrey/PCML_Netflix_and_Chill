@@ -17,12 +17,7 @@ import numpy as np
 import os
 import sys
 import pickle
-
-
-# from pyspark.mllib.recommendation import ALS
-# from pyspark import *
-# from pyspark.sql import *
-
+import time
 
 def load_csv(filename='data/data_train.csv'):
     """
