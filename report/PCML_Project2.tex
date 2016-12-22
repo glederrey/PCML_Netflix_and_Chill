@@ -133,7 +133,7 @@ Another $1'176'952$ ratings are hidden from us and must be predicted by our reco
 
 \subsection{Search for Spammers}
 
-One of the first step before starting learning from data is to ensure that they are real ones, and not produced by bots (spammers). As we know, spammers can act in different ways: \textbf{uniform spammers} constantly rate movies in the same way, while \textbf{random spammers} randomly rate movies. In order to check their existence, we analyzed the variances of user ratings: uniform spammers would be put in evidence by null variance, while random spammers present abnormally high variance. Figure (\ref{variances}) shows the Gaussian distribution of the rating variances and ensure the data are free of spammers.
+One of the first step before starting learning from data is to ensure that they are real ones, and not produced by bots (spammers). As we know, spammers can act in different ways: \textbf{uniform spammers} constantly rate movies in the same way, while \textbf{random spammers} randomly rate movies. Figure (\ref{variances}) shows the Gaussian distribution of the rating variances and ensure the data are free of spammers.
 
 \subsection{Participation of Users}
 
@@ -141,7 +141,7 @@ Even free of spammers, data can still contain \textbf{inactive users}, i.e. user
 
 \subsection{User "Moods" (Deviation)}
 
-Because of mood/education//habits users having the same appreciation of a movie can rate it differently. Indeed, we show in the figure (\ref{mood}) that some users systematically rate lower/higher than others. It's important to take this effect into account in both evaluation of a movie and recommendation for the user and proceed to a normalization of the ratings. As shown later, we will keep some algorithms in both their normalized and unnormalized forms (see section \ref{with_without_norm}).
+Because of mood/education//habits \textbf{users having the same appreciation of a movie can rate it differently}. Indeed, we show in the figure (\ref{mood}) that some users systematically rate lower/higher than others. It's interesting to take this effect into account to create a variation of a model. (see section \ref{choice_model}).
 
 \begin{figure}[htbp] %-------------- FIGURE -------------
   \centering
@@ -179,8 +179,7 @@ where $\overline{m}$ is either the mean or the median of the ratings on the movi
 
 \subsection{Matrix Factorization using Stochastic Gradient Descent (MF-SGD)}
 \label{sec:mf-sgd}
-Matrix factorization techniques proved to be one of the most effective strategies to implement 
-recommender systems. Given $D$ items, $N$ users and the corresponding rating matrix 
+Given $D$ items, $N$ users and the corresponding rating matrix 
 $X \in \mathbb{R}^{D \times N}$, we aim to find two matrices $W \in \mathbb{R}^{D \times K}$ and $Z
 \in \mathbb{R}^{N \times K}$ such that the quantity 
 
@@ -195,38 +194,24 @@ is minimized. $K$ is a parameter,
 corresponding to the number of the \textit{latent factors}; $\lambda$ is a scalar 
 that weight the regularization terms.
 
-Different techniques have been deployed to solve this minimization problem. In this Subsection we
-will present the Stochastic Gradient Descent method, while in the next one we explain the
-Alternating Least Square optimization. 
 The Stochastic Gradient Descent method is a faster variant of the standard gradient descent
 optimization. The gradient of the functional \ref{eq:functional} is computed only on a single
 element of the summation, randomly chosen. The update process then follows the same rules of the batch
 gradient descent.
 An almost certain convergence to a local minimum is guaranteed under not restrictive hypothesis.
 
-Using the \texttt{scipy.sparse} matrix library, we implemented the SGD method from scratch.
-Through a cross validation process we chose the best values for the parameters $K$, $\lambda$ and
-the number of iterations. The results that we obtained will be presented in Section
-\ref{sec:model_bench}.
-
 \subsection{Matrix Factorization using Alternating Least Square (ALS)}
-ALS is one of the main alternatives to the SGD to solve the problem \ref{eq:functional}.
+ALS is one of the main alternatives to the SGD to solve problem \ref{eq:functional}.
 It is an iterative algorithm consisting in alternately fixing one of the two matrices $W$ or $Z$,
 while optimizing the problem \ref{eq:functional} with respect to the other matrix.
 The optimization problem at each iteration is much easier to solve compared to the one solved by the
 SGD. A simple least squares technique can be exploited.
 
 %For speed reasons we decided to use the open source framework Apache Spark to implement this method.
-One of the most advanced open source frameworks available to solve this problem is Apache Spark. It
+PySpark\footnote{Apache Spark Python wrapper} provides the library \texttt{pyspark.mllib.recommendation.ALS}. It
 is a cluster computing framework that provides to the programmers an application programming
 interface to efficiently execute streaming, machine learning or SQL workloads that require fast
 iterative access to datasets.
-The Spark package \texttt{mllib} contains several implementations of different machine learning
-algorithms, including the ALS for collaborative filtering. Therefore we decided to exploit this
-library for the implementation.
-Spark also allows to specify the parameters $K$, the number of iterations and $\lambda$. We perform a
-cross validation to choose the best parameters, whose results will be discussed in Section 
-\ref{sec:model_bench}.
 
 \subsection{PyFM}
 
@@ -238,16 +223,7 @@ cross validation to choose the best parameters, whose results will be discussed 
 %the most advanced matrix factorization libraries.
 %\end{itemize}
 
-PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012}, one of the most advanced matrix factorization libraries. It can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD \ref{sec:mf-sgd}. 
-
-The usage of this library is really simple. It uses a few parameters:
-\begin{itemize}
- \item Number of factors corresponding to the scalar $K$ in the MF-SGD.
- \item Number of iterations
- \item Initial learning rate
-\end{itemize}
-
-The number of iterations was fixed. The two other parameters were chosen with the use of a simple cross validation process.
+PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012} and can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD. 
 
 \subsection{Matrix Factorization using Ridge Regression (MF-RR)}
 
@@ -333,11 +309,11 @@ Blending			&  0.95962 \\
 
 In order to create our recommender algorithm, we followed the steps: 
 \begin{enumerate}
-\item Tuning the parameters for each model one-by-one following a grid-search method scored by a 5-fold Cross-Validation. 
+\item \textbf{Tuning the parameters} for each model one-by-one following a grid-search method scored by a 5-fold Cross-Validation. 
 
-\item Computing the predictions for each model for 5 folded set of data. This result to a set of $5n$ prediction tables ($n$ being the number of models).
+\item \textbf{Computing the predictions} for each model for 5 folded set of data. This result to a set of $5n$ prediction tables\footnote{$n$ being the number of models} that can be tested agains 5 validation tables, providing 5-fold Cross-Validation.
 
-\item Optimizing the weights for each model prediction produced by the previous step, by running a SLSQP optimization method (as explained in section \ref{SLSQP}) on the 5 folded prediction tables. This allows to optimize the 5-fold Cross-Validation score.
+\item \textbf{Optimizing the weights} for each model prediction produced by the previous step, by running a SLSQP optimization method (as explained in section \ref{SLSQP}) on the 5 folded prediction tables.
 \end{enumerate}
 
 
@@ -354,7 +330,7 @@ The blending gives a 0.97452 RMSE on Kaggle's test set.
 % ===================================================
 \subsection{Blending}
 
-Table \ref{blending} provides the weights after minimizing on the average RMSE. It also provides the parameters used for each model.
+Table \ref{blending} provides the weights after optimization. It also provides the parameters used for each model.
 
 %===================================
 \begin{table}[htbp]
@@ -423,8 +399,7 @@ KNN User Based Rescaled                       		& 0.12803					& \textit{(idem)}\
 
 Excluding the trivial models based on the user/movie mean/median, we mainly focused on \textbf{Matrix
 Factorization algorithms}, exploiting different techniques to achieve the best factorization
-possible. Content-based filtering algorithms are not suited for this problem since the users and the
-movies are fully anonymized and without additional information.
+possible. 
 
 Blending plays an important role in our project. As we can see in table \ref{benchmark}, while models rarely score under $0.99$, blending achieve around $0.96$ RMSE. This is explained by the fact that certain model can compensate others for certain kind of users. The role of the optimizer is to find how to combine them in order to achieve best prediction.
 
@@ -433,6 +408,7 @@ Blending plays an important role in our project. As we can see in table \ref{ben
 
 % =====================================
 \subsubsection{Choice of the models}
+\label{choice_model}
 
 It should be legitimate to ask \textbf{why we are keeping both normalized and unnormalized model for
 some models}. Looking at the coefficients gives a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized models. The effect is that the method is more taken into account for users in the tail of the Gaussian deviation curve (figure \ref{mood}) than for the central ones. Then, it allows the optimizer to have finer control on the blending.
@@ -462,8 +438,8 @@ some models}. Looking at the coefficients gives a partial answer. As we see in t
 
 \subsubsection{Overfitting}
 We apply several techniques to reduce as much as possible the overfitting of the models we used. In
-particular we used a 5-fold cross-validation both to determine the best parameters for each model and to
-choose the best weights in the blending.
+particular we used a \textbf{5-fold cross-validation both to determine the best parameters for each model and to
+choose the best weights in the blending.}
 Despite this, the model slightly overfits the data. With a 0.95962 RMSE on our local Cross-Validation and 0.97452 on Kaggle's test set, we notice a small difference that indicates overfitting.
 
 There are many possible reasons underlying this behaviour. Probably the blending process that we
