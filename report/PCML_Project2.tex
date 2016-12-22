@@ -265,7 +265,7 @@ The number of iterations was fixed. The two other parameters were chosen with th
 \section{Blending}
 \label{sec:blending}
 
-The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred different models. \cite{BellKore_netflix} Without having the same number of models, we proceed the same to obtain our final solution. We perform a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). \textcolor{red}{Justify the negative weights as being not only "weights" but also the result of an optimization, and then treated as factor that can compensate between themselves.}
+The \textit{Bellkor's Pragmatic Chaos} team, winner of 2009 \textit{Netflix Prize}, explain in its paper that its solution was obtained by blending a hundred different models. \cite{BellKore_netflix} Without having the same number of models, we proceed the same to obtain our final solution. We perform a weighted sum that we optimize using \textbf{Sequential Least Squares Programming} (SLSQP) method provided by \texttt{scipy.optimize.minimize} library. Initial weights are set to $\nicefrac{1}{n}$ for each model ($n$ being the number of models). Instead of constraining the weights to be between 0 and 1, and to have a sum equals to 1, we choose to let the optimizer have more flexibility.
 
 \subsection{SLSQP method}
 \label{SLSQP}
@@ -274,11 +274,13 @@ Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. U
 %========================
 \section{Result}
 
-In order to create our recommender algorithm, we followed 2: 
+In order to create our recommender algorithm, we followed the steps: 
 \begin{enumerate}
-\item Tuning the parameters for each model one-by-one following a grid-search method scored by a 5-folds Cross-Validation
-%The first step is to find the best parameters for each models. Therefore, a cross validation process was used on the models MF-SGD, ALS, Collab. Filtering and PyFM. 
-\item Optimizing the weights for each model prediction produced by the previous step, by running a SLSQP (as explained in section \ref{SLSQP}) optimization method and by computing a 5-folds Cross-Validation score at each step of the algorithm. 
+\item Tuning the parameters for each model one-by-one following a grid-search method scored by a 5-folds Cross-Validation. 
+
+\item Computing the predictions for each model for 5 folded set of data. This result to a set of $5n$ prediction tables ($n$ being the number of models).
+
+\item Optimizing the weights for each model prediction produced by the previous step, by running a SLSQP optimization method (as explained in section \ref{SLSQP}) on the 5 folded prediction tables. This allow to optimize the 5-folds Cross-Validation score.
 \end{enumerate}
 
 
@@ -361,6 +363,8 @@ Excluding the trivial models based on the user/movie mean/median, we mainly focu
 Factorization algorithms}, exploiting different techniques to achieve the best factorization
 possible. Content-based filtering algorithms are not suited for this problem since the users and the
 movies are fully anonymized and without additional information.
+
+Blending plays an important role in our project. As we can wee in table \ref{benchmark}, \textcolor{red}{no models are scored under $0.99$ while blending RMSE achieve around $0.96$.} This can be explained by the fact that certain model compensate themselves well.
 
 The blending plays an important role in our project. For the large number of studied models,
 finding a good blend between them proved to be a complex task. The solution that we present pushes
