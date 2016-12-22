@@ -66,6 +66,7 @@ The predictions will be written in a file `predictions.py`. On a computer with a
 - *cross_validator.py*: is the class used to test models and blend them together
 - *rescaler.py* : is a normalizer class called by the models
 - *run.py* : run whole project and reproduce Kaggle's challenge predictions 
+- *cv.py*: run the cross-validation in order to blending all the models together and print the best weights for each model 
 
 
 ## Possible issues
