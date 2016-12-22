@@ -364,7 +364,7 @@ movies are fully anonymized and without additional information.
 
 The blending plays an important role in our project. For the large number of studied models,
 finding a good blend between them proved to be a complex task. The solution that we present pushes
-as much as possible the RMSE, while at the same time introducing a noticeable overfitting of the
+as much as possible the RMSE, while at the same time introducing a slight overfitting of the
 data. \textcolor{red}{Are we sure about that ?}
 In this Section we will discuss about these aspects.
 
@@ -391,7 +391,9 @@ optimize the weighted sum of models. Simpler methods, like grid search, are comp
 expensive and less accurate than the algorithm used. We spent some time in finding the best
 optimization method for our purposes. \textcolor{red}{review}
 
-We decided to also allow negative weight. This choice was made for two reasons:
+%We decided to also allow negative weight. This choice was made for two reasons:
+The optimization choice also allows negative weights. We decided not to put any contraint about that
+for two reasons:
 \begin{itemize}
 \item We obtained better results.
 \item Negative weights may help in better fitting the distribution of the training dataset. This can
@@ -406,14 +408,15 @@ same reasons.
 We apply several techniques to reduce as much as possible the overfitting of the models we used. In
 particular we used a 5-folds cross-validation both to determine the best parameters for each model and to
 choose the best weights in the blending.
-Despite this, the model slightly overfits the data. For the Kaggle submission We obtained a score of \textcolor{red}{ADD
+Despite this, the model slightly overfits the data. For the Kaggle submission we obtained a score of \textcolor{red}{ADD
 SCORE} in the training dataset and \textcolor{red}{ADD SCORE} in the validation dataset. 
 In the cross validation we obtained a score of \textcolor{red}{ADD SCORE}.
+
 There are many possible reasons underlying this behaviour. Probably the blending process that we
 used, although the proven accuracy, introcudes too much complexity in the model, thus overfitting
 the training database.
-Using simpler models would solve this problem, but would worsen the prediction. We therefore decided
-to keep the more complex one.
+Using simpler models would solve this problem, but would worsen the prediction. %We therefore decided
+%to keep the more complex one.
 
 \textcolor{red}{Good explanation and proof of the overfit. Remove the other mention of overfitting in discussion (model is not not SO badly overfitted)}
 
