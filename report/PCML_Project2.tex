@@ -349,7 +349,7 @@ Table \ref{blending} provides the weights after minimizing on the average RMSE. 
 \centering
 \begin{tabular}[c]{| l r l |}
 \hline
-Model 				& weight 							& parameters\\
+Model 				& Weight 							& Parameters\\
 \hline 
 \hline
 
@@ -365,70 +365,47 @@ Movie Median Deviation User           			& 0.93849					& -\\
 Movie Median Deviation User Rescaled 		& 0.96461					& -\\
 Movie Mean Deviation User             			& 1.04428					& -\\
 Movie Mean Deviation User Rescaled   		& 0.92108					& -\\
-MF RR                                   				& 0.03222					& \specialcell[t]{$\lambda = 0.081$ \\
-							rank = 8 \\
-							iterations = 24}\\
-MF RR Rescaled                         			& 0.03537					& -\\
-MF SGD                                  				& -0.78708					& -\\
-MF SGD Rescaled                       			& 0.27624					& -\\
+MF RR                                   				& 0.03222					& \specialcell[t]{features = 20 \\
+																$\lambda = 19$}\\
+MF RR Rescaled                         			& 0.03537					& \textit{(idem)}\\
+MF SGD                                  				& -0.78708					& \specialcell[t]{$\gamma = 0.004$ \\
+																features = 20 \\
+																iter = 20 }\\
+MF SGD Rescaled                       			& 0.27624					& \textit{(idem)}\\
 ALS                                      				& 0.30659					& \specialcell[t]{$\lambda = 0.081$ \\
-															rank = 8 \\
-															iterations = 24}\\
-ALS Rescaled                           				& 0.31745					& \textit{(idem ALS)}\\
-PyFM                                     				& 0.15296					& -\\
-PyFM Rescaled                           			& -0.02162					& -\\
+																rank = 8 \\
+																iter = 24}\\
+ALS Rescaled                           				& 0.31745					& \textit{(idem)}\\
+PyFM                                     				& 0.15296					& \specialcell[t]{features = 20 \\
+																iter = 200 \\
+																$ \gamma = 0.001$}\\
+PyFM Rescaled                           			& -0.02162					& \textit{(idem)}\\
 Baseline                                 				& -0.70720					& -\\
 Baseline Rescaled                       			& -0.56908					& -\\
 Slope One                               				& -0.02311					& -\\
 Slope One Rescaled                     			& 0.43863					& -\\
-SVD                                      				& 0.67558					& -\\
-SVD Rescaled                            			& -0.00498					& -\\
-KNN Item Based                                  		& -0.09500					& -\\
-KNN Item Based Rescaled                        		& 0.34178					& -\\
-KNN User Based                                  		& 0.21758					& -\\
-KNN User Based Rescaled                       		& 0.12803					& -\\
+SVD                                      				& 0.67558					& \specialcell[t]{$\gamma = 0.001$,\\
+																$\lambda = 0.001$, \\
+																iter = 30}\\
+SVD Rescaled                            			& -0.00498				& \textit{(idem)}\\
+KNN Item Based                                  		& -0.09500				& \specialcell[t]{$k = 60$,\\
+																sim. metric = \\
+																	Pearson Baseline}\\
+KNN Item Based Rescaled                        		& 0.34178					& \textit{(idem)}\\
+KNN User Based                                  		& 0.21758					& \specialcell[t]{$k = 300$,\\
+																sim. metric = \\
+																	Pearson Baseline}\\
+KNN User Based Rescaled                       		& 0.12803					& \textit{(idem)}\\
 
 
 
 \hline
 
 \end{tabular}
-  \caption{Blending of models.}
+  \caption{ Blending of models. {\footnotesize Legends:  $\gamma$: learning rate, $\lambda$: regularization factor, \textit{idem}: always refers to directly previous model}}
   \label{blending}
 \end{table}
 
-%\begin{table}[htbp]
-%\centering
-%\begin{tabular}[c]{| l l l |}
-%\hline
-%Model & weight & parameters\\
-%\hline 
-%\hline
-%Global mean			& 2.87634	& - \\
-%Global median 			& 0.88256	& - \\
-%User mean 			& -3.81181	& - \\
-%User median			& 0.00362	& - \\
-%Movie mean			& -1.57271	& - \\
-%Movie mean (mood norm.)		& 1.65276	& - \\
-%Movie median			& -2.27553	& - \\
-%Movie median (mood norm.)	& 2.27933	& - \\
-%MF-SGD (mood normalization)	& -0.16857	& \specialcell[t]{$\lambda = 0.004$ \\
-%							features = 20 \\
-%							iterations = 20} \\
-%ALS				& 0.75256	& \specialcell[t]{$\lambda = 0.081$ \\
-%							rank = 8 \\
-%							iterations = 24} \\
-%Collab. Filtering		& 0.04356	& \specialcell[t]{$\alpha = 19$ \\
-%							features = 20} \\
-%PyFM				& 0.30050 	& \specialcell[t]{factors = 20\\
-%							iterations = 100 \\
-%							learning rate = 0.001 \\} \\
-%\hline
-%
-%\end{tabular}
-%  \caption{Blending of models.}
-%  \label{blending}
-%\end{table}
 %========================
 \section{Discussion of the results}
 
