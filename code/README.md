@@ -21,7 +21,6 @@ Libraries installed with `pip`
 * NumPy
 * SciPy
 * Pandas
-* PySpark
 * scikit-learn
 
 Libraries with their own specific installation
@@ -37,7 +36,9 @@ pip install git+https://github.com/coreylynch/pyFM
 git clone https://github.com/NicolasHug/surprise.git
 python setup.py install
 ```
-
+* PySpark
+  - There are many ways to install it. The installation guide from Apache Spark is given [here](http://spark.apache.org/docs/0.9.0/python-programming-guide.html). A better installa guide is provided [here](https://www.dataquest.io/blog/pyspark-installation-guide). You can stop before installing the installation for Jupyter. For Mac, Homebrew provides the package `apache-spark`. If it's not installed correctly, the script `run.py` will tell you directly.
+  
 ## Run the project
 
 The predictions can be reproduce by running the provided run.py file.
