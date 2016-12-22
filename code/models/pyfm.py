@@ -36,7 +36,7 @@ def pyfm_rescaled(train, test, **kwargs):
     """
     
     # We commented the algorithm because it takes a long time to train and
-    # returns the predictions. If you want, you can uncomment the algorithm
+    # returns the predictions (approx. 1.30 hours). If you want, you can uncomment the algorithm
     # and make it run with the run.py
     
     """
@@ -74,7 +74,7 @@ def pyfm(train, test, **kwargs):
     """
 
     # We commented the algorithm because it takes a long time to train and
-    # returns the predictions. If you want, you can uncomment the algorithm
+    # returns the predictions (approx. 1.30 hours). If you want, you can uncomment the algorithm
     # and make it run with the run.py
 
     """
