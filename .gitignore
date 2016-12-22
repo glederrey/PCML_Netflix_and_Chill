@@ -117,6 +117,13 @@ notebooks/metastore_db/*
 *.pickle
 */*.pickle
 */*/*.pickle
+*/*/*/*.pickle
+
+# Remove csv files
+*.csv
+draft/*.csv
+draft/*/*.csv
+draft/*/*/*.csv
 
 # Remove stuff with report
 report/*.log
@@ -127,4 +134,4 @@ report/*.blg
 report/*.tex.backup
 report/*.tex.swp
 
-blender2/CV
+draft/blender2/CV
