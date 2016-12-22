@@ -154,15 +154,15 @@ Because of mood/education//habits \textbf{users having the same appreciation of 
 %========================
 \section{Models}
 
-\subsection{Global mean/median (2 models)}
+\subsection{Global mean/median}
 
 The simplest model is to take all the ratings in the train set and apply the mean or the median value. We return this value as the prediction. This give a baseline score from which we can compare further models.
 
-\subsection{User/Movie mean/median (4 models)}
+\subsection{User/Movie mean/median}
 
 Another simple model is to compute the mean or median value for the users or the movies.
 
-\subsection{Movie mean/median with normalized user moods (2 models)}
+\subsection{Movie mean/median with normalized user moods}
 
 The third set of model uses the mean or median value for each movie. We also compute the ``mood'' of the users this way:
 
@@ -207,7 +207,6 @@ while optimizing the problem \ref{eq:functional} with respect to the other matri
 The optimization problem at each iteration is much easier to solve compared to the one solved by the
 SGD. A simple least squares technique can be exploited.
 
-%For speed reasons we decided to use the open source framework Apache Spark to implement this method.
 PySpark\footnote{Apache Spark Python wrapper} provides the library \texttt{pyspark.mllib.recommendation.ALS}. It
 is a cluster computing framework that provides to the programmers an application programming
 interface to efficiently execute streaming, machine learning or SQL workloads that require fast
@@ -215,17 +214,11 @@ iterative access to datasets.
 
 \subsection{PyFM}
 
-%We implemented two version of the SGD methods:
-%\begin{itemize}
-%\item An implementation from scratch, using \texttt{scipy.sparse} matrices library.
-%\item An implementation based on the PyFM Python library, a wrapper of the C++ library libFM
-%\cite{rendle:tist2012}, one of
-%the most advanced matrix factorization libraries.
-%\end{itemize}
-
 PyFM is a python implementation of Factorization Machines. This library is a wrapper of the C++ library libFM \cite{rendle:tist2012} and can be found on Github \cite{pyfm}. The idea behind the algorithm is similar to the MF-SGD. 
 
 \subsection{Matrix Factorization using Ridge Regression (MF-RR)}
+
+The principle of this model is the same as the MF-SGD. The only difference is that the matrices $Z$ and $W$ are computed using the function \texttt{Ridge} from \texttt{sklearn.linear\_model} until convergence under a given tolerance. The regularization parameter $\lambda$ is directly inserted in the Ridge Regression. Predictions are given by $WZ^T$.
 
 \subsection{Baseline}
 Baseline algorithm adding to the global mean a bias for each user/movie. Algorithm implemented in the
@@ -403,38 +396,12 @@ possible.
 
 Blending plays an important role in our project. As we can see in table \ref{benchmark}, while models rarely score under $0.99$, blending achieve around $0.96$ RMSE. This is explained by the fact that certain model can compensate others for certain kind of users. The role of the optimizer is to find how to combine them in order to achieve best prediction.
 
-%We can first discuss about the models. The models we used are quite simple. Therefore, using more
-%complex algorithms instead of these would help in achieving better results. However with our blending method, we can use as many algorithms as we want. Indeed, since we're using an optimization algorithm, the optimization can decide itself if it should discard a model or not. However there's some risk to overfit the data. And it is happening a little bit. Indeed, the RMSE on the validations sets is a bit smaller than the RMSE on Kaggle. 
-
 % =====================================
 \subsubsection{Choice of the models}
 \label{choice_model}
 
 It should be legitimate to ask \textbf{why we are keeping both normalized and unnormalized model for
 some models}. Looking at the coefficients gives a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized models. The effect is that the method is more taken into account for users in the tail of the Gaussian deviation curve (figure \ref{mood}) than for the central ones. Then, it allows the optimizer to have finer control on the blending.
-
-%\subsubsection{Blending Choices} 
-%\textcolor{red}{REVIEW}
-%The role of the blending part is extremely important in obtaining the best score possible. The large
-%number of models available would be pointless without a good blend. Moreover, we mainly consider
-%simple models, leaving to the blender the task of building a more complex one.
-%
-%As mentioned in Section \ref{sec:blending} we used the Sequential Least Square Programming method to
-%optimize the weighted sum of models. Simpler methods, like a grid search, are computationally too
-%expensive and less accurate than the algorithm used. We spent some time in finding the best
-%optimization method for our purposes. \textcolor{red}{review}
-%
-%%We decided to also allow negative weight. This choice was made for two reasons:
-%The optimization choice also allows negative weights. We decided not to put any constraint about that
-%for two reasons:
-%\begin{itemize}
-%\item We obtained better results.
-%\item Negative weights may help in better fitting the distribution of the training dataset. This can
-%lead to overfitting, as we discuss in the next subsection, but, at the same time, it also produces
-%better results.
-%\end{itemize}
-%We also did not put any constraint on the sum of the weight (i.e. the sum is not fixed  to 1) for the
-%same reasons.
 
 \subsubsection{Overfitting}
 We apply several techniques to reduce as much as possible the overfitting of the models we used. In
@@ -445,10 +412,6 @@ Despite this, the model slightly overfits the data. With a 0.95962 RMSE on our l
 There are many possible reasons underlying this behaviour. Probably the blending process that we
 used, although the proven accuracy, introduces too much complexity in the model, thus overfitting
 the training database.
-
-
-
-
 
 \bibliographystyle{IEEEtran}
 \bibliography{literature}
