@@ -9,60 +9,48 @@
 
 """
 Matrix Factorization using Stochastic Gradient Descent (MF-SGD)
-
-Works with scipy.sparse matrices but take pandas.DataFrame as argument and convert them (in order to keep consistency
-between methods)
-
 """
 
-import numpy as np
-import scipy.sparse as sp
-from models.helpers_scipy import *
 from models.means import *
 from rescaler import Rescaler
+from models.helpers_scipy import *
 
 
-def matrix_factorization_SGD_rescaling(df_train, df_test, **kwargs):
+def mf_SGD_rescaled(train, test, **kwargs):
     """
-    Matrix factorization using SGD.
-    First do a rescaling of the user in a way that they all have the same mean of rating.
-    This counter the effect of "mood" of users. Some of them given worst/better grade even if they have the same
-    appreciation of a movie.
+    Matrix factorization using SGD rescaled.
+
+    First, a rescaling of the user such that they all have the same average of rating is done.
+    Then, the predictions are done using the function mf_SGD().
+    Finally, the predictions are rescaled to recover the deviation of each user.
 
     Args:
-        df_train (pd.DataFrame): train set
-        df_test (pd.DataFrame): test set
-        **kwargs: Arbitrary keyword arguments.
-            gamma (float): regularization parameter
-            n_features (int): number of features for matrices
-            n_iter (int): number of iterations
-            init_method ('global_mean' or 'movie_mean'): kind of initial matrices (better result with 'global_mean')
+        train (pandas.DataFrame): train set
+        test (pandas.DataFrame): test set
+        **kwargs: Arbitrary keyword arguments. Directly given to mf_SGD().
 
     Returns:
         pandas.DataFrame: predictions, sorted by (Movie, User)
-
     """
-
-    # normalize users
-    rescaler = Rescaler(df_train)
+    # Load the class Rescaler
+    rescaler = Rescaler(train)
+    # Normalize the train data
     df_train_normalized = rescaler.normalize_deviation()
 
-    # run MF-SGD modeling
-    prediction_normalized = matrix_factorization_SGD(df_train_normalized, df_test, **kwargs)
-
-    # recover unnormalized predictions
+    # Predict using the normalized trained data
+    prediction_normalized = mf_SGD(df_train_normalized, test, **kwargs)
+    # Rescale the prediction to recover the deviations
     prediction = rescaler.recover_deviation(prediction_normalized)
-
     return prediction
 
 
-def matrix_factorization_SGD(df_train, df_test, **kwargs):
+def mf_SGD(train, test, **kwargs):
     """
     Matrix factorization using SGD.
 
     Args:
-        df_train (pd.DataFrame): train set
-        df_test (pd.DataFrame): test set
+        train (pd.DataFrame): train set
+        test (pd.DataFrame): test set
         **kwargs: Arbitrary keyword arguments.
             gamma (float): regularization parameter
             n_features (int): number of features for matrices
@@ -81,8 +69,8 @@ def matrix_factorization_SGD(df_train, df_test, **kwargs):
     init_method = kwargs['init_method']
 
     # convert to scipy.sparse matrices
-    train = df_to_sp(df_train)
-    test = df_to_sp(df_test)
+    train = df_to_sp(train)
+    test = df_to_sp(test)
 
     # set seed
     np.random.seed(988)

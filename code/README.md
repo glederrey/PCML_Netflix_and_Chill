@@ -10,18 +10,30 @@ Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch
 
 ## Required Libraries
 
+Default libraries
+* os
+* collections
+* cython
+
+Libraries installed with Pip
 * NumPy
 * SciPy
 * Pandas
 * PySpark
 * scikit-learn
-* PyFM
 
-All these libraries are available through pip3 installer, except PyFM coming from 
-[this GitHub repo](https://github.com/coreylynch/pyFM) and installable with the following
+Libraries with their own specific installation
+* PyFM
+  - It comes from [this GitHub repo](https://github.com/coreylynch/pyFM) and installable with the following
 command:
 ```
 pip install git+https://github.com/coreylynch/pyFM
+```
+* SurPRISE
+  - It comes from [this GitHub repo](https://github.com/NicolasHug/Surprise). Please install it using the following commands:
+```
+git clone https://github.com/NicolasHug/surprise.git
+python setup.py install
 ```
 
 ## Run the project
@@ -32,7 +44,7 @@ The predictions can be reproduce by running the provided run.py file.
 spark-submit run.py
 ```
 
-The predictions will be written in a file `predictions.py`
+The predictions will be written in a file `predictions.py`. On a computer with an Intel i7-6820HK, it took around 2 hours to produce the predictions.
 
 ## File organisation
 
@@ -40,15 +52,18 @@ The predictions will be written in a file `predictions.py`
     - *data_train.csv* : train set
     - *sampleSubmissionn.csv* : test set provided by Kaggle
     - *deviation_per_user.csv* : pre-computed user deviation dictionary
+    - *pyfm_pred.csv*: Predictions for the PyFM model. (To make the predictions faster)
+    - *pyfm_rescaled_pred.csv*: Prediction for the PyFM rescaled model. (To make the predictions faster)
 - *models* : contains all models (one by file) used in the project
     - *als.py*
-    - *collaborative_filtering.py*
     - *means.py*
     - *median.py*
     - *MF_SGD.py*
-- *cross_validation* : classes used to test models and select their parameters
-    - *cross_validation.py* 
-    - *cross_validation_blender.py*
+    - *MF_RR.py*
+    - *pyfm.py*
+    - *surprise_models.py*
+    - *helpers_scipy.py*
+- *cross_validator.py*: is the class used to test models and blend them together
 - *rescaler.py* : is a normalizer class called by the models
 - *run.py* : run whole project and reproduce Kaggle's challenge predictions 
 
