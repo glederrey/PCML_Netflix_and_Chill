@@ -1,13 +1,15 @@
 # EPFL ML Recommender System
 
-## Team members
+## Team
 
-Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch
-
-Stefano Savarè, SCIPER 260960, stefano.savare@epfl.ch
-
-Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch
-
+**Just Keep Swimming!**
+```
+`     |\`               Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch
+\`._.-' `--.
+ ) o o =[#]#]           Stefano Savarè, SCIPER 260960, stefano.savare@epfl.ch
+ ) _o      -3           
+/.' `-.,---'            Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch
+```
 ## Required Libraries
 
 Default libraries
