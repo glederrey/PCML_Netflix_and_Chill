@@ -4,7 +4,7 @@
 
 **Just Keep Swimming!**
 ```
-`     |\`               Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch
+,     |\`               Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch
 \`._.-' `--.
  ) o o =[#]#]           Stefano Savarè, SCIPER 260960, stefano.savare@epfl.ch
  ) _o      -3           
