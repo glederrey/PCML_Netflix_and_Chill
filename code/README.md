@@ -1,13 +1,15 @@
 # EPFL ML Recommender System
 
-## Team members
+## Team
 
-Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch
-
-Stefano Savarè, SCIPER 260960, stefano.savare@epfl.ch
-
-Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch
-
+**Just Keep Swimming!**
+```
+`     |\`               Gael Lederrey, SCIPER 204874, gael.lederrey@epfl.ch
+\`._.-' `--.
+ ) o o =[#]#]           Stefano Savarè, SCIPER 260960, stefano.savare@epfl.ch
+ ) _o      -3           
+/.' `-.,---'            Joachim Muth, SCIPER 214757, joachim.muth@epfl.ch
+```
 ## Required Libraries
 
 Default libraries
@@ -15,7 +17,7 @@ Default libraries
 * collections
 * cython
 
-Libraries installed with Pip
+Libraries installed with `pip`
 * NumPy
 * SciPy
 * Pandas
@@ -44,7 +46,7 @@ The predictions can be reproduce by running the provided run.py file.
 spark-submit run.py
 ```
 
-The predictions will be written in a file `predictions.py`. On a computer with an Intel i7-6820HK, it took around 2 hours to produce the predictions.
+The predictions will be written in a file `predictions.csv`. On a computer with an Intel i7-6820HK and with 16GB of RAM, it took around 2 hours to produce the predictions.
 
 ## File organisation
 
