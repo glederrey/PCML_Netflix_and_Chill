@@ -388,7 +388,8 @@ Blending plays an important role in our project. As we can see in table \ref{ben
 It should be legitimate to ask \textbf{why we are keeping both normalized and unnormalized model for
 some models}. Looking at the coefficients gives a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized models. The effect is that the method is more taken into account for users in the tail of the Gaussian deviation curve (figure \ref{mood}) than for the central ones. Then, it allows the optimizer to have finer control on the blending.
 
-\subsubsection{Blending Choices}
+\subsubsection{Blending Choices} 
+\textcolor{red}{REVIEW}
 The role of the blending part is extremely important in obtaining the best score possible. The large
 number of models available would be pointless without a good blend. Moreover, we mainly consider
 simple models, leaving to the blender the task of building a more complex one.
@@ -409,23 +410,16 @@ better results.
 \end{itemize}
 We also did not put any constraint on the sum of the weight (i.e. the sum is not fixed  to 1) for the
 same reasons.
-\textcolor{red}{Refact explaining the weights are result of an optimization, not a weight search.}
 
 \subsubsection{Overfitting}
 We apply several techniques to reduce as much as possible the overfitting of the models we used. In
 particular we used a 5-fold cross-validation both to determine the best parameters for each model and to
 choose the best weights in the blending.
-Despite this, the model slightly overfits the data. For the Kaggle submission we obtained a score of \textcolor{red}{ADD
-SCORE} in the training dataset and \textcolor{red}{ADD SCORE} in the validation dataset. 
-In the cross validation we obtained a score of \textcolor{red}{ADD SCORE}.
+Despite this, the model slightly overfits the data. With a 0.95962 RMSE on our local Cross-Validation and 0.97452 on Kaggle's test set, we notice a small difference that indicates overfitting.
 
 There are many possible reasons underlying this behaviour. Probably the blending process that we
 used, although the proven accuracy, introduces too much complexity in the model, thus overfitting
 the training database.
-Using simpler models would solve this problem, but would worsen the prediction. %We therefore decided
-%to keep the more complex one.
-
-\textcolor{red}{Good explanation and proof of the overfit. Remove the other mention of overfitting in discussion (model is not not SO badly overfitted)}
 
 
 
