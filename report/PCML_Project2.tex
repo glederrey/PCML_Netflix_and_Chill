@@ -228,12 +228,24 @@ PyFM is a python implementation of Factorization Machines. This library is a wra
 \subsection{Matrix Factorization using Ridge Regression (MF-RR)}
 
 \subsection{Baseline}
+Baseline algorithm adding to the global mean a bias for each user/movie. Algorithm implemented in the
+Python Surprise library. \cite{library:surprise}
+
 
 \subsection{Slope One}
+Prediction algorithm consisting in predicting $\hat r_{ui}$ with:
+$$ \hat r_{ui}=\mu_u + \frac{1}{|R_i(u)|}\sum_{j\in R_i(u)} dev(i,j)$$
+where $R_u(i)$ is the set of relevents item, i.e. the set of items $j$ rated by $u$ that also have
+at least one common user with $i$, and $\text{dev}(i,j)$ is defined as the average difference
+between the ratings of $i$ and those of $j$. Algorithm implemented in the Python Surprise library.
+\cite{library:surprise}
 
 \subsection{SVD}
+Optimization using the standard SVD decomposition. Algorithm implemented in the Python Surprise library. \cite{library:surprise}
 
-\subsection{KNN item/user based}
+\subsection{KNN user/item based}
+KNN is a prediction algorithm consisting in predicting a rating exploiting a weighted sum of 
+of the other users/items ratings with the help of a similarity metric. Algorithm implemented in the Python Surprise library. \cite{library:surprise}
 
 
 %========================
