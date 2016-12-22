@@ -160,11 +160,13 @@ def main():
     print("[INFO] Completed in %s\n" % (time_str(time.time() - tt)))
 
     print("[INFO] Preparing Model 19/30: Factorization Machine with PyFM")
+    print("[INFO] Model is loaded (not trained) in order to save time. Please see models.pyfm for more information")
     tt = time.time()
     models['pyfm'] = pyfm(train, test, num_factors=20, num_iter=200, init_lr=0.001)
     print("[INFO] Completed in %s\n" % (time_str(time.time() - tt)))
 
     print("[INFO] Preparing Model 20/30: Factorization Machine with PyFM rescaled with User mood")
+    print("[INFO] Model is loaded (not trained) in order to save time. Please see models.pyfm for more information")
     tt = time.time()
     models['pyfm_rescaled'] = pyfm_rescaled(train, test, num_factors=20, num_iter=200, init_lr=0.001)
     print("[INFO] Completed in %s\n" % (time_str(time.time() - tt)))
@@ -211,11 +213,14 @@ def main():
     print("[INFO] Completed in %s\n" % (time_str(time.time() - tt)))
 
     print("[INFO] Preparing Model 29/30: kNN user-based")
+    print("[INFO] Modeling takes approximately 30min")
     tt = time.time()
     models['knn_ub'] = knn(train, test, k=300, sim_options={'name': 'pearson_baseline', 'user_based': True})
     print("[INFO] Completed in %s\n" % (time_str(time.time() - tt)))
 
     print("[INFO] Preparing Model 30/30: kNN user-based rescaled with User mood")
+    print("[INFO] Modeling takes approximately 30min")
+
     tt = time.time()
     models['knn_ub_rescaled'] = knn_rescaled(train, test, k=300, sim_options={'name': 'pearson_baseline',
                                                                               'user_based': True})
