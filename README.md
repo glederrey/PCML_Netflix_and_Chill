@@ -4,9 +4,9 @@ For the course CS-433 (Pattern Classification and Machine Learning) at the EPFL,
 ## Results
 
 * Public Leaderboard:
-  - ??th with RMSE of 0.97452
+  - **??th** with RMSE of **0.97452**
 * Private Leaderboard
-  - ??th with RMSE of 0.XXXXX
+  - **??th** with RMSE of **0.XXXXX**
   
 ## Folders
 
