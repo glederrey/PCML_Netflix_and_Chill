@@ -238,14 +238,14 @@ $$ \hat r_{ui}=\mu_u + \frac{1}{|R_i(u)|}\sum_{j\in R_i(u)} dev(i,j)$$
 where $R_u(i)$ is the set of relevents item, i.e. the set of items $j$ rated by $u$ that also have
 at least one common user with $i$, and $\text{dev}(i,j)$ is defined as the average difference
 between the ratings of $i$ and those of $j$. Algorithm implemented in the Python Surprise library.
-\cite{library:surprise}
+\cite{library:surprise} \cite{lemire2005slope}
 
 \subsection{SVD}
 Optimization using the standard SVD decomposition. Algorithm implemented in the Python Surprise library. \cite{library:surprise}
 
 \subsection{KNN user/item based}
-KNN is a prediction algorithm consisting in predicting a rating exploiting a weighted sum of 
-of the other users/items ratings with the help of a similarity metric. Algorithm implemented in the Python Surprise library. \cite{library:surprise}
+KNN is a prediction algorithm consisting in predicting a rating exploiting a weighted sum 
+of the other users/items ratings with the help of a similarity metric, in our case Pearson Baseline. Algorithm implemented in the Python Surprise library. \cite{library:surprise}
 
 
 %========================
