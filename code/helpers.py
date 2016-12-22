@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+import pickle
 
 
 # from pyspark.mllib.recommendation import ALS
@@ -90,13 +91,14 @@ def split(df, cut):
     return train, test
 
 
-def evaluate(prediction, test_set):
+def evaluate(prediction, truth):
     """ compute RMSE for pandas.DataFrame prediction table """
-    test2 = test_set.sort_values(['Movie', 'User']).reset_index(drop=True)
+    truth_sorted = truth.sort_values(['Movie', 'User']).reset_index(drop=True)
+    prediction_sorted = prediction.sort_values(['Movie', 'User']).reset_index(drop=True)
 
-    test2['square_error'] = np.square(test2['Rating'] - prediction['Rating'])
+    truth_sorted['square_error'] = np.square(truth_sorted['Rating'] - prediction_sorted['Rating'])
 
-    mse = test2['square_error'].mean()
+    mse = truth_sorted['square_error'].mean()
     rmse = np.sqrt(mse)
 
     return rmse
@@ -124,10 +126,41 @@ def blender(models, weights):
     for model in models.keys():
         blend['Rating'] += \
             weights[model] * unified_ordering(models[model])['Rating']
+            
+    pred = list(blend['Rating'])
+    
+    for i in range(len(pred)):
+        if pred[i] > 5:
+            pred[i] = 5
+        elif pred[i] < 1:
+            pred[i] = 1
+    
+    blend['Rating'] = pred
 
     return blend
-
 
 def unified_ordering(df):
     """ Order pandas.DataFrame by ('Movie', 'User') and reset index """
     return df.sort_values(['Movie', 'User']).reset_index(drop=True)
+
+
+def create_folder(folder_name):
+    """ check if folder exists to avoid error and create it if not """
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    
+        
+def time_str(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    
+    if h > 0:
+        str_ = "%d hour %d min. %d sec."%(h, m, s)
+    elif m > 0:
+        str_ = "%d min. %d sec."%(m, s)
+    else:
+        str_ = "%.3f sec."%s
+    return str_  
+    
+def save(obj, name):
+    pickle.dump(obj, open(name, 'wb'))      
