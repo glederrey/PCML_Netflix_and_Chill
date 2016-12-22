@@ -251,7 +251,14 @@ The number of iterations was fixed. The two other parameters were chosen with th
 
 \subsection{Matrix Factorization using Ridge Regression (MF-RR)}
 
-\textcolor{red}{Small description}
+\subsection{Baseline}
+
+\subsection{Slope One}
+
+\subsection{SVD}
+
+\subsection{KNN item/user based}
+
 
 %========================
 \section{Blending}
@@ -270,38 +277,38 @@ Sequential Least Squares Programming method is a \textbf{Quasi-Newton method}. U
 Model & RMSE \\
 \hline 
 \hline
-global\_mean                             			& 1.11905\\
-global\_median                          			 	& 1.12811\\
-user\_mean                               				& 1.09516\\
-user\_median                             			& 1.15146\\
-movie\_mean                              			& 1.03043\\
-movie\_mean\_rescaled                    			& 1.00562\\
-movie\_median                            			& 1.09968\\
-movie\_median\_rescaled                  		& 1.02267\\
-movie\_median\_deviation\_user           		& 1.07220\\
-movie\_median\_deviation\_user\_rescaled 	& 1.06465\\
-movie\_mean\_deviation\_user             		& 0.99661 \\
-movie\_mean\_deviation\_user\_rescaled   	& 1.04494\\
-mf\_rr                                   				& 1.02774\\
-mf\_rr\_rescaled                         			& 1.02746\\
-mf\_sgd                                  				& 1.00080\\
-mf\_sgd\_rescaled                       			& 0.99993 \\
-als                                      				& 0.98874\\
-als\_rescaled                            				& 0.98903 \\
-pyfm                                     				& 0.98802 \\
-pyfm\_rescaled                           			& 0.98863 \\
-baseline                                 				& 0.99925 \\
-baseline\_rescaled                       			& 1.00039\\
-slope\_one                               				& 1.00010\\
-slope\_one\_rescaled                     			& 1.00032\\
-svd                                      				& 0.99835\\
-svd\_rescaled                            				& 0.99840 \\
-knn\_ib                                  				& 0.99031 \\
-knn\_ib\_rescaled                        			& 0.99043\\
-knn\_ub                                  				& 0.99244 \\
-knn\_ub\_rescaled                        			& 0.99351 \\
+Global Mean                  	           			& 1.11905\\
+Global Median                          			 	& 1.12811\\
+User Mean                               				& 1.09516\\
+User Median                             				& 1.15146\\
+Movie Mean                              				& 1.03043\\
+Movie Mean Rescaled                    			& 1.00562\\
+Movie Median                            				& 1.09968\\
+Movie Median Rescaled                  			& 1.02267\\
+Movie Median Deviation User           			& 1.07220\\
+Movie Median Deviation User Rescaled 		& 1.06465\\
+Movie Mean Deviation User             			& 0.99661 \\
+Movie Mean Deviation User Rescaled   		& 1.04494\\
+MF RR                                   				& 1.02774\\
+MF RR Rescaled                         			& 1.02746\\
+MF SGD                                  				& 1.00080\\
+MF SGD Rescaled                       			& 0.99993 \\
+ALS                                      				& 0.98874\\
+ALS Rescaled                           				& 0.98903 \\
+PyFM                                     				& 0.98802 \\
+PyFM Rescaled                           			& 0.98863 \\
+Baseline                                 				& 0.99925 \\
+Baseline Rescaled                       			& 1.00039\\
+Slope One                               				& 1.00010\\
+Slope One Rescaled                     			& 1.00032\\
+SVD                                      				& 0.99835\\
+SVD Rescaled                            			& 0.99840 \\
+KNN Item Based                                  		& 0.99031 \\
+KNN Item Based Rescaled                        		& 0.99043\\
+KNN User Based                                  		& 0.99244 \\
+KNN User Based Rescaled                       		& 0.99351 \\
  \hline \hline
-blending			&  0.95962 \\ 
+Blending			&  0.95962 \\ 
 \hline
 \end{tabular}
   \caption{Benchmark of models.}
@@ -337,38 +344,91 @@ The blending gives a 0.97452 RMSE on Kaggle's test set.
 
 Table \ref{blending} provides the weights after minimizing on the average RMSE. It also provides the parameters used for each model.
 
+%===================================
 \begin{table}[htbp]
 \centering
-\begin{tabular}[c]{| l l l |}
+\begin{tabular}[c]{| l r l |}
 \hline
-Model & weight & parameters\\
+Model 				& weight 							& parameters\\
 \hline 
 \hline
-Global mean			& 2.87634	& - \\
-Global median 			& 0.88256	& - \\
-User mean 			& -3.81181	& - \\
-User median			& 0.00362	& - \\
-Movie mean			& -1.57271	& - \\
-Movie mean (mood norm.)		& 1.65276	& - \\
-Movie median			& -2.27553	& - \\
-Movie median (mood norm.)	& 2.27933	& - \\
-MF-SGD (mood normalization)	& -0.16857	& \specialcell[t]{$\lambda = 0.004$ \\
-							features = 20 \\
-							iterations = 20} \\
-ALS				& 0.75256	& \specialcell[t]{$\lambda = 0.081$ \\
+
+Global Mean                  	           			& 1.77567		 			& - \\
+Global Median                          			 	&1.84693					& - \\
+User Mean                               				& -3.64246					& -\\
+User Median                             				& 0.00513					& -\\
+Movie Mean                              				& -0.83307					& -\\
+Movie Mean Rescaled                    			& -0.95695					& -\\
+Movie Median                            				& -0.93869					& -\\
+Movie Median Rescaled                  			& -0.91347					& -\\
+Movie Median Deviation User           			& 0.93849					& -\\
+Movie Median Deviation User Rescaled 		& 0.96461					& -\\
+Movie Mean Deviation User             			& 1.04428					& -\\
+Movie Mean Deviation User Rescaled   		& 0.92108					& -\\
+MF RR                                   				& 0.03222					& \specialcell[t]{$\lambda = 0.081$ \\
 							rank = 8 \\
-							iterations = 24} \\
-Collab. Filtering		& 0.04356	& \specialcell[t]{$\alpha = 19$ \\
-							features = 20} \\
-PyFM				& 0.30050 	& \specialcell[t]{factors = 20\\
-							iterations = 100 \\
-							learning rate = 0.001 \\} \\
+							iterations = 24}\\
+MF RR Rescaled                         			& 0.03537					& -\\
+MF SGD                                  				& -0.78708					& -\\
+MF SGD Rescaled                       			& 0.27624					& -\\
+ALS                                      				& 0.30659					& \specialcell[t]{$\lambda = 0.081$ \\
+															rank = 8 \\
+															iterations = 24}\\
+ALS Rescaled                           				& 0.31745					& \textit{(idem ALS)}\\
+PyFM                                     				& 0.15296					& -\\
+PyFM Rescaled                           			& -0.02162					& -\\
+Baseline                                 				& -0.70720					& -\\
+Baseline Rescaled                       			& -0.56908					& -\\
+Slope One                               				& -0.02311					& -\\
+Slope One Rescaled                     			& 0.43863					& -\\
+SVD                                      				& 0.67558					& -\\
+SVD Rescaled                            			& -0.00498					& -\\
+KNN Item Based                                  		& -0.09500					& -\\
+KNN Item Based Rescaled                        		& 0.34178					& -\\
+KNN User Based                                  		& 0.21758					& -\\
+KNN User Based Rescaled                       		& 0.12803					& -\\
+
+
+
 \hline
 
 \end{tabular}
   \caption{Blending of models.}
   \label{blending}
 \end{table}
+
+%\begin{table}[htbp]
+%\centering
+%\begin{tabular}[c]{| l l l |}
+%\hline
+%Model & weight & parameters\\
+%\hline 
+%\hline
+%Global mean			& 2.87634	& - \\
+%Global median 			& 0.88256	& - \\
+%User mean 			& -3.81181	& - \\
+%User median			& 0.00362	& - \\
+%Movie mean			& -1.57271	& - \\
+%Movie mean (mood norm.)		& 1.65276	& - \\
+%Movie median			& -2.27553	& - \\
+%Movie median (mood norm.)	& 2.27933	& - \\
+%MF-SGD (mood normalization)	& -0.16857	& \specialcell[t]{$\lambda = 0.004$ \\
+%							features = 20 \\
+%							iterations = 20} \\
+%ALS				& 0.75256	& \specialcell[t]{$\lambda = 0.081$ \\
+%							rank = 8 \\
+%							iterations = 24} \\
+%Collab. Filtering		& 0.04356	& \specialcell[t]{$\alpha = 19$ \\
+%							features = 20} \\
+%PyFM				& 0.30050 	& \specialcell[t]{factors = 20\\
+%							iterations = 100 \\
+%							learning rate = 0.001 \\} \\
+%\hline
+%
+%\end{tabular}
+%  \caption{Blending of models.}
+%  \label{blending}
+%\end{table}
 %========================
 \section{Discussion of the results}
 
@@ -377,7 +437,7 @@ Factorization algorithms}, exploiting different techniques to achieve the best f
 possible. Content-based filtering algorithms are not suited for this problem since the users and the
 movies are fully anonymized and without additional information.
 
-Blending plays an important role in our project. As we can see in table \ref{benchmark}, no models are scored under $0.99$ while blending achieve around $0.96$ RMSE. This can be explained by the fact that certain model compensate themselves well.
+Blending plays an important role in our project. As we can see in table \ref{benchmark}, while models rarely score under $0.99$, blending achieve around $0.96$ RMSE. This is explained by the fact that certain model can compensate others for certain kind of users. The role of the optimizer is to find how to combine them in order to achieve best prediction.
 
 %We can first discuss about the models. The models we used are quite simple. Therefore, using more
 %complex algorithms instead of these would help in achieving better results. However with our blending method, we can use as many algorithms as we want. Indeed, since we're using an optimization algorithm, the optimization can decide itself if it should discard a model or not. However there's some risk to overfit the data. And it is happening a little bit. Indeed, the RMSE on the validations sets is a bit smaller than the RMSE on Kaggle. 
@@ -388,28 +448,28 @@ Blending plays an important role in our project. As we can see in table \ref{ben
 It should be legitimate to ask \textbf{why we are keeping both normalized and unnormalized model for
 some models}. Looking at the coefficients gives a partial answer. As we see in table \ref{blending}, normalized and unnormalized models oppose themselves almost exactly, with a little advantage for normalized models. The effect is that the method is more taken into account for users in the tail of the Gaussian deviation curve (figure \ref{mood}) than for the central ones. Then, it allows the optimizer to have finer control on the blending.
 
-\subsubsection{Blending Choices} 
-\textcolor{red}{REVIEW}
-The role of the blending part is extremely important in obtaining the best score possible. The large
-number of models available would be pointless without a good blend. Moreover, we mainly consider
-simple models, leaving to the blender the task of building a more complex one.
-
-As mentioned in Section \ref{sec:blending} we used the Sequential Least Square Programming method to
-optimize the weighted sum of models. Simpler methods, like a grid search, are computationally too
-expensive and less accurate than the algorithm used. We spent some time in finding the best
-optimization method for our purposes. \textcolor{red}{review}
-
-%We decided to also allow negative weight. This choice was made for two reasons:
-The optimization choice also allows negative weights. We decided not to put any constraint about that
-for two reasons:
-\begin{itemize}
-\item We obtained better results.
-\item Negative weights may help in better fitting the distribution of the training dataset. This can
-lead to overfitting, as we discuss in the next subsection, but, at the same time, it also produces
-better results.
-\end{itemize}
-We also did not put any constraint on the sum of the weight (i.e. the sum is not fixed  to 1) for the
-same reasons.
+%\subsubsection{Blending Choices} 
+%\textcolor{red}{REVIEW}
+%The role of the blending part is extremely important in obtaining the best score possible. The large
+%number of models available would be pointless without a good blend. Moreover, we mainly consider
+%simple models, leaving to the blender the task of building a more complex one.
+%
+%As mentioned in Section \ref{sec:blending} we used the Sequential Least Square Programming method to
+%optimize the weighted sum of models. Simpler methods, like a grid search, are computationally too
+%expensive and less accurate than the algorithm used. We spent some time in finding the best
+%optimization method for our purposes. \textcolor{red}{review}
+%
+%%We decided to also allow negative weight. This choice was made for two reasons:
+%The optimization choice also allows negative weights. We decided not to put any constraint about that
+%for two reasons:
+%\begin{itemize}
+%\item We obtained better results.
+%\item Negative weights may help in better fitting the distribution of the training dataset. This can
+%lead to overfitting, as we discuss in the next subsection, but, at the same time, it also produces
+%better results.
+%\end{itemize}
+%We also did not put any constraint on the sum of the weight (i.e. the sum is not fixed  to 1) for the
+%same reasons.
 
 \subsubsection{Overfitting}
 We apply several techniques to reduce as much as possible the overfitting of the models we used. In
