@@ -4,15 +4,15 @@ For the course CS-433 (Pattern Classification and Machine Learning) at the EPFL,
 ## Results
 
 * Public Leaderboard:
-  - **??th** with RMSE of **0.97452**
+  - **4th** with RMSE of **0.97452**
 * Private Leaderboard
-  - **??th** with RMSE of **0.XXXXX**
+  - **4th** with RMSE of **0.97653**
   
 ## Folders
 
 * `code`: The final code given for the submission of the project
 * `draft`: Bunch of Python notebooks and python code created during the whole project
-* `report`: Report in LaTeX
+* `report`: Report in LaTeX ([link](report/PCML_Project2.pdf) to the pdf)
 
 ## Questions
 If you have questions, please contact the authors about the project:
